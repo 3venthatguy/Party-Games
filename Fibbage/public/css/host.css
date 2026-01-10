@@ -236,6 +236,21 @@ body {
   margin: 40px 0;
 }
 
+/* Smaller question during results */
+.question-display.results-mode {
+  font-size: 24px;
+  margin: 10px auto 20px auto;
+  line-height: 1.3;
+  text-align: center;
+  max-width: 1200px;
+}
+
+.question-number.results-mode {
+  font-size: 18px;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
 .correct-answer-reveal {
   background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
   border-radius: 20px;
@@ -341,7 +356,8 @@ body {
   padding: 20px 60px;
   border-radius: 50px;
   cursor: pointer;
-  margin-top: 30px;
+  margin: 30px auto 0 auto;
+  display: block;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s, box-shadow 0.3s;
 }

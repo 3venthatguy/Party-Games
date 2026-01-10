@@ -5,6 +5,9 @@
 const ResultsAnimator = require('../../game/ResultsAnimator');
 const { logError } = require('../../utils/logger');
 
+// Store active animators by room code
+const activeAnimators = new Map();
+
 /**
  * Sets up results animation event handlers.
  * @param {object} io - Socket.io server instance
@@ -12,9 +15,21 @@ const { logError } = require('../../utils/logger');
  * @param {GameManager} gameManager - Game manager instance
  */
 function setupResultsEvents(io, socket, gameManager) {
-  // This is called when voting phase completes and results should be shown
-  // The actual animation sequence is triggered from playerEvents.js
-  // This file exists for potential future direct results requests
+  // Handle host clicking "Show Leaderboard" button
+  socket.on('showLeaderboard', ({ roomCode }) => {
+    console.log('[ResultsEvents] Host requested leaderboard for room:', roomCode);
+    const animator = activeAnimators.get(roomCode);
+    if (animator) {
+      animator.showLeaderboardNow();
+
+      // Show next button after a delay
+      setTimeout(() => {
+        io.to(roomCode).emit('results:showNextButton', {
+          sequenceId: animator.sequenceId
+        });
+      }, 3000); // 3 second delay
+    }
+  });
 }
 
 /**
@@ -52,6 +67,9 @@ async function startResultsAnimation(io, roomCode, gameManager) {
 
     console.log('[ResultsEvents] Creating ResultsAnimator...');
     const animator = new ResultsAnimator(gameState, io, roomCode);
+
+    // Store animator for button click handling
+    activeAnimators.set(roomCode, animator);
 
     // Start animation sequence (non-blocking)
     console.log('[ResultsEvents] Starting animation sequence...');

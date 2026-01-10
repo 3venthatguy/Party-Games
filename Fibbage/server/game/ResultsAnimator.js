@@ -10,30 +10,8 @@ class ResultsAnimator {
     this.gameState = gameState;
     this.io = io;
     this.roomCode = roomCode;
-    this.timings = this.getAnimationTimings();
+    this.timings = config.RESULTS_ANIMATION_TIMINGS;
     this.sequenceId = Date.now();
-  }
-
-  /**
-   * Gets animation timing constants.
-   * @returns {object} Timing configuration
-   */
-  getAnimationTimings() {
-    return {
-      answerHighlight: 500,
-      voterAppearStagger: 200,
-      authorRevealPause: 500,
-      authorRevealDuration: 1000,
-      scoreAnimationDuration: 1000,
-      reactionPause: 500,
-      transitionDuration: 300,
-      correctAnswerBuildUp: 2000,
-      correctAnswerReveal: 1000,
-      correctVoterAppearStagger: 200,
-      explanationDisplay: 4000,
-      scoreboardAnimation: 2000,
-      betweenAnswers: 300
-    };
   }
 
   /**
@@ -257,13 +235,29 @@ class ResultsAnimator {
     // Sort by score descending
     const sortedScores = [...totalScores].sort((a, b) => b.score - a.score);
 
-    this.io.to(this.roomCode).emit('results:showLeaderboard', {
+    // Store scoreboard data for when button is clicked
+    this.leaderboardData = {
       sequenceId: this.sequenceId,
       sortedPlayers: sortedScores,
       roundScores: roundScores,
       totalScores: totalScores
+    };
+
+    // Show the "Show Leaderboard" button instead of auto-showing
+    this.io.to(this.roomCode).emit('results:showLeaderboardButton', {
+      sequenceId: this.sequenceId
     });
-    await this.delay(this.timings.scoreboardAnimation);
+
+    // Don't auto-proceed - wait for host to click the button
+  }
+
+  /**
+   * Shows the leaderboard (called when host clicks the button).
+   */
+  showLeaderboardNow() {
+    if (this.leaderboardData) {
+      this.io.to(this.roomCode).emit('results:showLeaderboard', this.leaderboardData);
+    }
   }
 }
 

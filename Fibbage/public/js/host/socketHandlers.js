@@ -38,9 +38,11 @@ function setupHostSocketHandlers(socket, state) {
     questionDisplay.textContent = question;
     questionNumber.textContent = `Question ${questionIndex + 1} of ${totalQuestions}`;
 
-    // Show question elements (in case they were hidden during results)
+    // Show question elements and restore normal size (remove results-mode class)
     questionDisplay.style.display = 'block';
+    questionDisplay.classList.remove('results-mode');
     questionNumber.style.display = 'block';
+    questionNumber.classList.remove('results-mode');
 
     // Show game screen
     hideLobbyScreen();
@@ -168,9 +170,21 @@ function setupHostSocketHandlers(socket, state) {
     }
   });
 
+  socket.on('results:showLeaderboardButton', (data) => {
+    if (typeof handleShowLeaderboardButton === 'function') {
+      handleShowLeaderboardButton(data);
+    }
+  });
+
   socket.on('results:showLeaderboard', (data) => {
     if (typeof handleShowLeaderboard === 'function') {
       handleShowLeaderboard(data);
+    }
+  });
+
+  socket.on('results:showNextButton', (data) => {
+    if (typeof handleShowNextButton === 'function') {
+      handleShowNextButton(data);
     }
   });
 

@@ -31,12 +31,14 @@ function showResultsPhase() {
   votingPhase.style.display = 'none';
   resultsPhase.style.display = 'block';
 
-  // Keep question visible during results animation
+  // Keep question visible during results animation but make it smaller
   if (questionDisplay) {
     questionDisplay.style.display = 'block';
+    questionDisplay.classList.add('results-mode');
   }
   if (questionNumber) {
     questionNumber.style.display = 'block';
+    questionNumber.classList.add('results-mode');
   }
 
   console.log('[ResultsScreen] Results phase UI updated');
@@ -358,6 +360,33 @@ function handleShowExplanation(data) {
 }
 
 /**
+ * Handles showing the leaderboard button.
+ * @param {object} data - Button data
+ */
+function handleShowLeaderboardButton(data) {
+  if (data.sequenceId !== currentSequenceId) return;
+
+  const leaderboardArea = document.getElementById('leaderboardArea');
+  if (!leaderboardArea) return;
+
+  leaderboardArea.style.display = 'block';
+  leaderboardArea.innerHTML = `
+    <button class="show-leaderboard-button" id="showLeaderboardButton">
+      Show Leaderboard
+    </button>
+  `;
+
+  const button = document.getElementById('showLeaderboardButton');
+  button.onclick = () => {
+    if (hostState && hostState.roomCode) {
+      socket.emit('showLeaderboard', { roomCode: hostState.roomCode });
+      button.disabled = true;
+      button.style.display = 'none';
+    }
+  };
+}
+
+/**
  * Handles showing leaderboard.
  * @param {object} data - Leaderboard data
  */
@@ -372,6 +401,19 @@ function handleShowLeaderboard(data) {
     animationState.roundScores = data.roundScores;
   }
 
+  // Hide all other elements to make leaderboard exclusive
+  const answersRevealArea = document.getElementById('answersRevealArea');
+  const correctAnswerArea = document.getElementById('correctAnswerArea');
+  const explanationArea = document.getElementById('explanationArea');
+  const questionDisplay = document.getElementById('questionDisplay');
+  const questionNumber = document.getElementById('questionNumber');
+
+  if (answersRevealArea) answersRevealArea.style.display = 'none';
+  if (correctAnswerArea) correctAnswerArea.style.display = 'none';
+  if (explanationArea) explanationArea.style.display = 'none';
+  if (questionDisplay) questionDisplay.style.display = 'none';
+  if (questionNumber) questionNumber.style.display = 'none';
+
   const leaderboardArea = document.getElementById('leaderboardArea');
   if (!leaderboardArea) return;
 
@@ -385,7 +427,7 @@ function handleShowLeaderboard(data) {
     const entry = document.createElement('div');
     entry.className = 'leaderboard-entry';
     entry.style.animationDelay = `${index * 0.1}s`;
-    
+
     const roundScore = data.roundScores[player.id] || 0;
     entry.innerHTML = `
       <div class="leaderboard-rank">${index + 1}</div>
@@ -393,18 +435,25 @@ function handleShowLeaderboard(data) {
       <div class="leaderboard-score">${player.score.toLocaleString()}</div>
       ${roundScore > 0 ? `<div class="leaderboard-round-score">+${roundScore}</div>` : ''}
     `;
-    
+
     leaderboardList.appendChild(entry);
   });
 
   leaderboardArea.appendChild(leaderboardList);
+}
 
-  // Show next button
+/**
+ * Handles showing the next button.
+ * @param {object} data - Button data
+ */
+function handleShowNextButton(data) {
+  if (data.sequenceId !== currentSequenceId) return;
+
   const nextButton = document.getElementById('nextButton');
   if (nextButton) {
     nextButton.style.display = 'block';
     nextButton.classList.add('fade-in');
-    
+
     // Ensure event listener is attached (in case button was recreated)
     nextButton.onclick = () => {
       if (hostState && hostState.roomCode) {

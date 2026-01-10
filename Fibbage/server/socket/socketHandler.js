@@ -7,6 +7,7 @@ const { setupConnectionEvents } = require('./events/connectionEvents');
 const { setupRoomEvents } = require('./events/roomEvents');
 const { setupGameEvents } = require('./events/gameEvents');
 const { setupPlayerEvents } = require('./events/playerEvents');
+const { setupResultsEvents } = require('./events/resultsEvents');
 
 /**
  * Sets up all socket.io event handlers.
@@ -19,6 +20,7 @@ function setupSocketHandlers(io, gameManager) {
     setupRoomEvents(io, socket, gameManager);
     setupGameEvents(io, socket, gameManager);
     setupPlayerEvents(io, socket, gameManager);
+    setupResultsEvents(io, socket, gameManager);
   });
 }
 

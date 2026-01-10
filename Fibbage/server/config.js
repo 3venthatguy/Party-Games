@@ -38,18 +38,18 @@ module.exports = {
 
   // Results animation timings (in milliseconds)
   RESULTS_ANIMATION_TIMINGS: {
-    answerHighlight: 500,
-    voterAppearStagger: 200,
-    authorRevealPause: 500,
-    authorRevealDuration: 1000,
-    scoreAnimationDuration: 1000,
-    reactionPause: 500,
-    transitionDuration: 300,
+    answerHighlight: 800,
+    voterAppearStagger: 300,
+    authorRevealPause: 800,
+    authorRevealDuration: 1500,
+    scoreAnimationDuration: 1500,
+    reactionPause: 1000,
+    transitionDuration: 500,
     correctAnswerBuildUp: 2000,
     correctAnswerReveal: 1000,
     correctVoterAppearStagger: 200,
     explanationDisplay: 4000,
     scoreboardAnimation: 2000,
-    betweenAnswers: 300
+    betweenAnswers: 500
   }
 };
