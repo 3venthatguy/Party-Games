@@ -85,7 +85,9 @@ function setupPlayerSocketHandlers(socket, state) {
   socket.on('phaseChange', (data) => {
     state.currentPhase = data.phase;
 
-    if (data.phase === 'submit') {
+    if (data.phase === 'reading') {
+      showPlayerReadingPhase(data.timeRemaining);
+    } else if (data.phase === 'submit') {
       showPlayerSubmitPhase();
     } else if (data.phase === 'voting') {
       showPlayerVotingPhase();

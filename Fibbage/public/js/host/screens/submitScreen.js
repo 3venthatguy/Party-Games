@@ -3,14 +3,40 @@
  */
 
 /**
- * Shows the submit phase UI.
- * @param {number} playerCount - Number of players
+ * Shows the reading phase UI.
+ * @param {number} duration - Duration in seconds
  */
-function showSubmitPhase(playerCount) {
+function showReadingPhase(duration) {
+  const readingPhase = document.getElementById('readingPhase');
   const submitPhase = document.getElementById('submitPhase');
   const votingPhase = document.getElementById('votingPhase');
   const resultsPhase = document.getElementById('resultsPhase');
 
+  readingPhase.style.display = 'block';
+  submitPhase.style.display = 'none';
+  votingPhase.style.display = 'none';
+  resultsPhase.style.display = 'none';
+
+  // Start progress bar animation
+  const progressBar = document.getElementById('readingProgressBar');
+  progressBar.classList.remove('animating');
+  // Force reflow to restart animation
+  void progressBar.offsetWidth;
+  progressBar.classList.add('animating');
+  progressBar.style.animationDuration = duration + 's';
+}
+
+/**
+ * Shows the submit phase UI.
+ * @param {number} playerCount - Number of players
+ */
+function showSubmitPhase(playerCount) {
+  const readingPhase = document.getElementById('readingPhase');
+  const submitPhase = document.getElementById('submitPhase');
+  const votingPhase = document.getElementById('votingPhase');
+  const resultsPhase = document.getElementById('resultsPhase');
+
+  readingPhase.style.display = 'none';
   submitPhase.style.display = 'block';
   votingPhase.style.display = 'none';
   resultsPhase.style.display = 'none';

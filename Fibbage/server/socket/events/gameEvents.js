@@ -31,10 +31,10 @@ function setupGameEvents(io, socket, gameManager) {
             totalQuestions: currentState.selectedQuestionIds.length
           });
 
-          console.log('[GameEvents] Emitting phaseChange to submit (startGame)');
+          console.log('[GameEvents] Emitting phaseChange to reading (startGame)');
           io.to(roomCode).emit('phaseChange', {
-            phase: 'submit',
-            timeRemaining: config.SUBMIT_PHASE_DURATION
+            phase: 'reading',
+            timeRemaining: config.READING_PHASE_DURATION
           });
 
           // Start timer broadcasts
@@ -68,10 +68,10 @@ function setupGameEvents(io, socket, gameManager) {
             totalQuestions: gameState.selectedQuestionIds.length
           });
 
-          console.log('[GameEvents] Emitting phaseChange to submit (nextQuestion)');
+          console.log('[GameEvents] Emitting phaseChange to reading (nextQuestion)');
           io.to(roomCode).emit('phaseChange', {
-            phase: 'submit',
-            timeRemaining: config.SUBMIT_PHASE_DURATION
+            phase: 'reading',
+            timeRemaining: config.READING_PHASE_DURATION
           });
 
           startTimerBroadcast(io, roomCode, gameManager);

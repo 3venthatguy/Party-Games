@@ -15,11 +15,12 @@ module.exports = {
 
   // Game configuration
   MIN_PLAYERS: 2,
-  QUESTIONS_PER_GAME: 8,
+  QUESTIONS_PER_GAME: 2,
   MAX_PLAYER_NAME_LENGTH: 20,
   MAX_ANSWER_LENGTH: 100,
 
   // Phase durations (in seconds)
+  READING_PHASE_DURATION: 10,
   SUBMIT_PHASE_DURATION: 30,
   VOTING_PHASE_DURATION: 20,
 
@@ -39,16 +40,16 @@ module.exports = {
   // Results animation timings (in milliseconds)
   RESULTS_ANIMATION_TIMINGS: {
     answerHighlight: 500,
-    suspensePause: 800,
+    suspensePause: 1000,
     lieRevealDuration: 1500,
-    voterAppearStagger: 300,
+    voterAppearStagger: 1000,
     authorRevealDuration: 1500,
     scoreAnimationDuration: 1500,
-    reactionPause: 1000,
-    transitionDuration: 500,
-    correctAnswerHighlight: 500,
+    reactionPause: 2000,
+    transitionDuration: 1000,
+    correctAnswerHighlight: 1000,
     truthRevealDuration: 1500,
-    correctVoterAppearStagger: 300,
+    correctVoterAppearStagger: 2000,
     explanationDisplay: 4000,
     scoreboardAnimation: 2000,
     betweenAnswers: 500

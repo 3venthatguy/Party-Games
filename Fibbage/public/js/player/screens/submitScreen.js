@@ -3,6 +3,32 @@
  */
 
 /**
+ * Shows the reading phase UI.
+ * @param {number} duration - Duration in seconds
+ */
+function showPlayerReadingPhase(duration) {
+  const readingPhase = document.getElementById('readingPhase');
+  const submitPhase = document.getElementById('submitPhase');
+  const votingPhase = document.getElementById('votingPhase');
+  const watchScreen = document.getElementById('watchScreen');
+
+  readingPhase.style.display = 'block';
+  submitPhase.style.display = 'none';
+  votingPhase.style.display = 'none';
+  if (watchScreen) {
+    watchScreen.style.display = 'none';
+  }
+
+  // Start progress bar animation
+  const progressBar = document.getElementById('readingProgressBar');
+  progressBar.classList.remove('animating');
+  // Force reflow to restart animation
+  void progressBar.offsetWidth;
+  progressBar.classList.add('animating');
+  progressBar.style.animationDuration = duration + 's';
+}
+
+/**
  * Sets up the submit screen inputs and button.
  * @param {Function} onSubmit - Callback when submit button is clicked
  */
@@ -40,6 +66,7 @@ function setupSubmitScreen(onSubmit) {
  * Shows the submit phase UI.
  */
 function showPlayerSubmitPhase() {
+  const readingPhase = document.getElementById('readingPhase');
   const submitPhase = document.getElementById('submitPhase');
   const votingPhase = document.getElementById('votingPhase');
   const watchScreen = document.getElementById('watchScreen');
@@ -48,6 +75,7 @@ function showPlayerSubmitPhase() {
   const questionNumber = document.getElementById('questionNumber');
   const timerDisplay = document.getElementById('timerDisplay');
 
+  readingPhase.style.display = 'none';
   submitPhase.style.display = 'block';
   votingPhase.style.display = 'none';
   if (watchScreen) {

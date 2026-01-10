@@ -217,6 +217,15 @@ class GameManager {
   }
 
   /**
+   * Gets game room for a room code.
+   * @param {string} roomCode - Room code
+   * @returns {GameRoom|null} Game room or null
+   */
+  getGameRoom(roomCode) {
+    return this.rooms.get(roomCode) || null;
+  }
+
+  /**
    * Handles player disconnect.
    * @param {string} socketId - Socket ID
    * @returns {object|null} Disconnect info

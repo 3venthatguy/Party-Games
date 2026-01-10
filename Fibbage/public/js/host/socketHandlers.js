@@ -62,7 +62,9 @@ function setupHostSocketHandlers(socket, state) {
     console.log('[SocketHandlers] phaseChange event received:', data);
     state.currentPhase = data.phase;
 
-    if (data.phase === 'submit') {
+    if (data.phase === 'reading') {
+      showReadingPhase(data.timeRemaining);
+    } else if (data.phase === 'submit') {
       showSubmitPhase(state.players.length);
     } else if (data.phase === 'voting') {
       console.log('[SocketHandlers] Showing voting phase...');

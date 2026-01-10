@@ -96,8 +96,17 @@ class GameRoom {
     const question = this.questionLoader(questionId);
 
     this.gameState.setQuestion(question, index);
+    this.gameState.setPhase('reading');
+    this.gameState.startTimer(config.READING_PHASE_DURATION);
+  }
+
+  /**
+   * Transitions from reading phase to submit phase.
+   */
+  transitionToSubmit() {
     this.gameState.setPhase('submit');
     this.gameState.startTimer(config.SUBMIT_PHASE_DURATION);
+    logPhaseTransition(this.gameState.roomCode, 'submit');
   }
 
   /**

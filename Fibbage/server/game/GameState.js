@@ -117,7 +117,7 @@ class GameState {
 
   /**
    * Changes the current phase.
-   * @param {string} phase - New phase ('lobby', 'submit', 'voting', 'results', 'gameOver')
+   * @param {string} phase - New phase ('lobby', 'reading', 'submit', 'voting', 'results', 'gameOver')
    */
   setPhase(phase) {
     this.phase = phase;

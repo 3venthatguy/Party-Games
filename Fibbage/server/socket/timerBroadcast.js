@@ -27,13 +27,37 @@ function startTimerBroadcast(io, roomCode, gameManager) {
       // Timer expired, handle auto-transition based on current phase
       const currentPhase = gameState.phase;
 
-      if (currentPhase === 'submit') {
+      if (currentPhase === 'reading') {
+        handleReadingPhaseExpiry(io, roomCode, gameState, gameManager, timerInterval);
+      } else if (currentPhase === 'submit') {
         handleSubmitPhaseExpiry(io, roomCode, gameState, gameManager, timerInterval);
       } else if (currentPhase === 'voting') {
         handleVotingPhaseExpiry(io, roomCode, gameState, gameManager, timerInterval);
       }
     }
   }, config.TIMER_BROADCAST_INTERVAL);
+}
+
+/**
+ * Handles timer expiry during reading phase.
+ */
+function handleReadingPhaseExpiry(io, roomCode, gameState, gameManager, timerInterval) {
+  console.log('[TimerBroadcast] Reading phase expired, transitioning to submit');
+
+  // Get the game room to call transitionToSubmit
+  const gameRoom = gameManager.getGameRoom(roomCode);
+  if (gameRoom) {
+    gameRoom.transitionToSubmit();
+  }
+
+  console.log('[TimerBroadcast] Emitting phaseChange to submit (reading phase expired)');
+  io.to(roomCode).emit('phaseChange', {
+    phase: 'submit',
+    timeRemaining: config.SUBMIT_PHASE_DURATION
+  });
+
+  startTimerBroadcast(io, roomCode, gameManager);
+  clearInterval(timerInterval);
 }
 
 /**
@@ -94,8 +118,8 @@ function handleVotingPhaseExpiry(io, roomCode, gameState, gameManager, timerInte
           });
 
           io.to(roomCode).emit('phaseChange', {
-            phase: 'submit',
-            timeRemaining: config.SUBMIT_PHASE_DURATION
+            phase: 'reading',
+            timeRemaining: config.READING_PHASE_DURATION
           });
 
           startTimerBroadcast(io, roomCode, gameManager);

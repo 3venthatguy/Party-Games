@@ -145,6 +145,49 @@ body {
   animation: timerPulse 0.5s ease-in-out infinite;
 }
 
+/* Reading Phase */
+.reading-phase {
+  margin: 40px 0;
+  text-align: center;
+}
+
+.reading-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  z-index: 1000;
+}
+
+.reading-progress-bar.animating {
+  animation: progressBarShrink linear forwards;
+}
+
+@keyframes progressBarShrink {
+  from {
+    width: 100%;
+    background: linear-gradient(90deg, #4ade80 0%, #22c55e 100%);
+  }
+  to {
+    width: 0%;
+    background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+  }
+}
+
+.reading-message {
+  font-size: 42px;
+  font-weight: bold;
+  margin: 50px 0;
+  animation: readingPulse 2s ease-in-out infinite;
+}
+
+@keyframes readingPulse {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
 /* Submit Phase */
 .submit-phase {
   margin: 40px 0;
