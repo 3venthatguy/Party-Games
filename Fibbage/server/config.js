@@ -38,16 +38,17 @@ module.exports = {
 
   // Results animation timings (in milliseconds)
   RESULTS_ANIMATION_TIMINGS: {
-    answerHighlight: 800,
+    answerHighlight: 500,
+    suspensePause: 800,
+    lieRevealDuration: 1500,
     voterAppearStagger: 300,
-    authorRevealPause: 800,
     authorRevealDuration: 1500,
     scoreAnimationDuration: 1500,
     reactionPause: 1000,
     transitionDuration: 500,
-    correctAnswerBuildUp: 2000,
-    correctAnswerReveal: 1000,
-    correctVoterAppearStagger: 200,
+    correctAnswerHighlight: 500,
+    truthRevealDuration: 1500,
+    correctVoterAppearStagger: 300,
     explanationDisplay: 4000,
     scoreboardAnimation: 2000,
     betweenAnswers: 500

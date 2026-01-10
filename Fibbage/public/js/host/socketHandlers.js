@@ -140,15 +140,21 @@ function setupHostSocketHandlers(socket, state) {
     }
   });
 
-  socket.on('results:correctAnswerBuild', (data) => {
-    if (typeof handleCorrectAnswerBuild === 'function') {
-      handleCorrectAnswerBuild(data);
+  socket.on('results:revealLie', (data) => {
+    if (typeof handleRevealLie === 'function') {
+      handleRevealLie(data);
     }
   });
 
-  socket.on('results:correctAnswerReveal', (data) => {
-    if (typeof handleCorrectAnswerReveal === 'function') {
-      handleCorrectAnswerReveal(data);
+  socket.on('results:highlightCorrectAnswer', (data) => {
+    if (typeof handleHighlightCorrectAnswer === 'function') {
+      handleHighlightCorrectAnswer(data);
+    }
+  });
+
+  socket.on('results:revealTruth', (data) => {
+    if (typeof handleRevealTruth === 'function') {
+      handleRevealTruth(data);
     }
   });
 

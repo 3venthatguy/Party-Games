@@ -251,6 +251,12 @@ const questions = [
     question: "The Roman Republic's first known financial crisis (c. 352 BCE) was solved by creating a public debt registry and allowing debtors to pay off loans by surrendering _____ instead of land.", 
     answer: "their freedom", 
     explanation: "Debt bondage was so common they basically legalized voluntary temporary slavery as a repayment option. Ancient debt-relief had strings attached." 
+  },
+  {
+    id: 43,
+    question: "Robert Fogel's study estimated that the total social saving from U.S. _____ in 1890 was about 2.7% of GNP.",
+    answer: "railroads",
+    explanation: "Fogel's counterfactual analysis showed that while railroads were important, their overall contribution to economic growth was less than previously thought, as other transportation modes could have filled much of the gap."
   }
 ];
 

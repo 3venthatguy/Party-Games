@@ -30,8 +30,8 @@ class ResultsAnimator {
   async playResultsSequence(results) {
     const { correctAnswer, explanation, roundScores, totalScores, votes, voteCounts } = results;
 
-    // Prepare answer order (fake answers first, correct last)
-    const fakeAnswers = this.gameState.players
+    // Prepare fake answers with vote information
+    const allFakeAnswers = this.gameState.players
       .filter(player => {
         const answer = this.gameState.submittedAnswers[player.id];
         return answer && answer !== correctAnswer;
@@ -44,31 +44,51 @@ class ResultsAnimator {
         pointsEarned: roundScores[player.id] || 0
       }));
 
-    // Emit start sequence event
+    // CRITICAL: Filter to only include answers that received votes (Jackbox flow)
+    const votedOnFakeAnswers = allFakeAnswers.filter(answer => answer.voters.length > 0);
+
+    console.log(`[ResultsAnimator] Total fake answers: ${allFakeAnswers.length}, With votes: ${votedOnFakeAnswers.length}`);
+
+    // Prepare all answers data for client (including correct answer)
+    const allAnswersData = [
+      ...votedOnFakeAnswers.map(fa => ({
+        id: fa.playerId,
+        text: fa.answerText,
+        isCorrect: false
+      })),
+      {
+        id: 'correct',
+        text: correctAnswer,
+        isCorrect: true
+      }
+    ];
+
+    // Emit start sequence event with answer data
     this.io.to(this.roomCode).emit('results:startSequence', {
       sequenceId: this.sequenceId,
-      fakeAnswerCount: fakeAnswers.length,
-      timings: this.timings
+      fakeAnswerCount: votedOnFakeAnswers.length,
+      timings: this.timings,
+      answers: allAnswersData // NEW: Send answer data to client
     });
 
     // Wait a moment for clients to prepare
     await this.delay(500);
 
-    // Reveal each fake answer
-    for (let i = 0; i < fakeAnswers.length; i++) {
-      const fakeAnswer = fakeAnswers[i];
+    // Reveal each voted-on fake answer
+    for (let i = 0; i < votedOnFakeAnswers.length; i++) {
+      const fakeAnswer = votedOnFakeAnswers[i];
       await this.revealFakeAnswer(fakeAnswer, i);
-      
+
       // Brief pause between answers
-      if (i < fakeAnswers.length - 1) {
+      if (i < votedOnFakeAnswers.length - 1) {
         await this.delay(this.timings.betweenAnswers);
       }
     }
 
-    // Reveal correct answer
+    // Reveal correct answer (always last)
     await this.revealCorrectAnswer(correctAnswer, explanation, votes, roundScores);
 
-    // Show explanation
+    // Show explanation AFTER correct answer reveal
     await this.showExplanation(explanation);
 
     // Update scoreboard
@@ -113,7 +133,20 @@ class ResultsAnimator {
     });
     await this.delay(this.timings.answerHighlight);
 
-    // Phase 2: Show Voters
+    // Phase 2: Suspense Pause (NEW - Jackbox flow)
+    await this.delay(this.timings.suspensePause);
+
+    // Phase 3: Reveal "IT'S A LIE!" + Show Fooled Players
+    this.io.to(this.roomCode).emit('results:revealLie', {
+      sequenceId: this.sequenceId,
+      answerId: playerId,
+      authorName: playerName,
+      voters: voters,
+      pointsEarned: pointsEarned
+    });
+    await this.delay(this.timings.lieRevealDuration);
+
+    // Phase 4: Show Voters (fooled players fly in)
     this.io.to(this.roomCode).emit('results:showVoters', {
       sequenceId: this.sequenceId,
       answerId: playerId,
@@ -122,8 +155,7 @@ class ResultsAnimator {
     // Wait for voters to appear (staggered)
     await this.delay(this.timings.voterAppearStagger * voters.length + 500);
 
-    // Phase 3: Reveal Author
-    await this.delay(this.timings.authorRevealPause);
+    // Phase 5: Reveal Author
     this.io.to(this.roomCode).emit('results:revealAuthor', {
       sequenceId: this.sequenceId,
       answerId: playerId,
@@ -134,7 +166,7 @@ class ResultsAnimator {
     });
     await this.delay(this.timings.authorRevealDuration);
 
-    // Phase 4: Score Update
+    // Phase 6: Score Update
     if (pointsEarned > 0) {
       this.io.to(this.roomCode).emit('results:updateScore', {
         sequenceId: this.sequenceId,
@@ -145,10 +177,10 @@ class ResultsAnimator {
       await this.delay(this.timings.scoreAnimationDuration);
     }
 
-    // Phase 5: Reaction Pause
+    // Phase 7: Reaction Pause
     await this.delay(this.timings.reactionPause);
 
-    // Phase 6: Transition
+    // Phase 8: Transition
     this.io.to(this.roomCode).emit('results:transitionNext', {
       sequenceId: this.sequenceId,
       answerId: playerId
@@ -164,20 +196,24 @@ class ResultsAnimator {
    * @param {object} roundScores - Round scores
    */
   async revealCorrectAnswer(correctAnswer, explanation, votes, roundScores) {
-    // Phase 1: Buildup
-    this.io.to(this.roomCode).emit('results:correctAnswerBuild', {
-      sequenceId: this.sequenceId
-    });
-    await this.delay(this.timings.correctAnswerBuildUp);
-
-    // Phase 2: Correct Answer Reveal
-    this.io.to(this.roomCode).emit('results:correctAnswerReveal', {
+    // Phase 1: Highlight Correct Answer (NEW - Jackbox flow)
+    this.io.to(this.roomCode).emit('results:highlightCorrectAnswer', {
       sequenceId: this.sequenceId,
       answerText: correctAnswer
     });
-    await this.delay(this.timings.correctAnswerReveal);
+    await this.delay(this.timings.correctAnswerHighlight);
 
-    // Phase 3: Show Correct Voters
+    // Phase 2: Suspense Pause
+    await this.delay(this.timings.suspensePause);
+
+    // Phase 3: Reveal "THE TRUTH!" + Correct Answer
+    this.io.to(this.roomCode).emit('results:revealTruth', {
+      sequenceId: this.sequenceId,
+      answerText: correctAnswer
+    });
+    await this.delay(this.timings.truthRevealDuration);
+
+    // Phase 4: Show Correct Voters
     const correctVoters = this.getCorrectVoters(votes);
     this.io.to(this.roomCode).emit('results:showCorrectVoters', {
       sequenceId: this.sequenceId,
@@ -185,7 +221,7 @@ class ResultsAnimator {
     });
     await this.delay(this.timings.correctVoterAppearStagger * correctVoters.length + 500);
 
-    // Phase 4: Score Correct Voters
+    // Phase 5: Score Correct Voters
     const correctVotersWithScores = correctVoters.map(voter => ({
       ...voter,
       pointsEarned: roundScores[voter.id] || 0,

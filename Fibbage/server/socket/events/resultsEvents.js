@@ -40,7 +40,10 @@ function setupResultsEvents(io, socket, gameManager) {
  */
 async function startResultsAnimation(io, roomCode, gameManager) {
   try {
-    console.log('[ResultsEvents] Starting results animation for room:', roomCode);
+    console.log('[ResultsEvents] ========== START RESULTS ANIMATION ==========');
+    console.log('[ResultsEvents] Room:', roomCode);
+    console.log('[ResultsEvents] Active animators before:', activeAnimators.size);
+
     const gameState = gameManager.getGameState(roomCode);
     if (!gameState) {
       console.error('[ResultsEvents] No game state found for room:', roomCode);
@@ -51,6 +54,7 @@ async function startResultsAnimation(io, roomCode, gameManager) {
       return;
     }
 
+    console.log('[ResultsEvents] Current question index:', gameState.currentQuestionIndex);
     console.log('[ResultsEvents] Calculating results...');
     const results = gameManager.calculateResults(gameState);
     console.log('[ResultsEvents] Results calculated:', results);
@@ -65,11 +69,14 @@ async function startResultsAnimation(io, roomCode, gameManager) {
     // Wait a moment for clients to set up results UI
     await new Promise(resolve => setTimeout(resolve, 200));
 
-    console.log('[ResultsEvents] Creating ResultsAnimator...');
+    console.log('[ResultsEvents] Creating NEW ResultsAnimator...');
     const animator = new ResultsAnimator(gameState, io, roomCode);
+    console.log('[ResultsEvents] New animator sequenceId:', animator.sequenceId);
 
     // Store animator for button click handling
+    console.log('[ResultsEvents] Storing animator in activeAnimators Map');
     activeAnimators.set(roomCode, animator);
+    console.log('[ResultsEvents] Active animators after:', activeAnimators.size);
 
     // Start animation sequence (non-blocking)
     console.log('[ResultsEvents] Starting animation sequence...');

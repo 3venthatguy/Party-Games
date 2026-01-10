@@ -20,16 +20,22 @@ let animationState = {
  * Shows the results phase UI.
  */
 function showResultsPhase() {
-  console.log('[ResultsScreen] Showing results phase');
+  console.log('[ResultsScreen] ========== SHOW RESULTS PHASE ==========');
+  console.log('[ResultsScreen] About to reset state. Current sequenceId:', currentSequenceId);
+  console.log('[ResultsScreen] Current answerElements size:', answerElements.size);
+
   const submitPhase = document.getElementById('submitPhase');
   const votingPhase = document.getElementById('votingPhase');
   const resultsPhase = document.getElementById('resultsPhase');
   const questionDisplay = document.getElementById('questionDisplay');
   const questionNumber = document.getElementById('questionNumber');
 
+  console.log('[ResultsScreen] Hiding submitPhase and votingPhase, showing resultsPhase');
   submitPhase.style.display = 'none';
   votingPhase.style.display = 'none';
   resultsPhase.style.display = 'block';
+  console.log('[ResultsScreen] votingPhase display set to:', votingPhase.style.display);
+  console.log('[ResultsScreen] resultsPhase display set to:', resultsPhase.style.display);
 
   // Keep question visible during results animation but make it smaller
   if (questionDisplay) {
@@ -42,6 +48,11 @@ function showResultsPhase() {
   }
 
   console.log('[ResultsScreen] Results phase UI updated');
+
+  // CRITICAL: Reset sequence ID IMMEDIATELY to prepare for new animation
+  // This must happen BEFORE the results:startSequence event arrives
+  console.log('[ResultsScreen] Resetting currentSequenceId from', currentSequenceId, 'to null');
+  currentSequenceId = null;
 
   // Clear previous results but preserve structure
   const resultsContainer = document.getElementById('resultsPhase');
@@ -61,6 +72,9 @@ function showResultsPhase() {
     } else {
       // Clear content but keep structure
       answersRevealArea.innerHTML = '';
+      // CRITICAL: Reset display to block so animations are visible for all questions
+      answersRevealArea.style.display = 'block';
+
       document.getElementById('correctAnswerArea').innerHTML = '';
       document.getElementById('correctAnswerArea').style.display = 'none';
       document.getElementById('explanationArea').innerHTML = '';
@@ -75,6 +89,7 @@ function showResultsPhase() {
   }
 
   // Reset animation state
+  console.log('[ResultsScreen] Resetting animation state...');
   animationState = {
     currentAnswerIndex: 0,
     fakeAnswers: [],
@@ -85,73 +100,104 @@ function showResultsPhase() {
   };
   answerElements.clear();
   currentAnswerElement = null;
+  console.log('[ResultsScreen] State reset complete. answerElements size:', answerElements.size);
+  console.log('[ResultsScreen] ========== SHOW RESULTS PHASE COMPLETE ==========');
 }
 
 /**
  * Initializes the results animation sequence.
- * Creates answer cards from voting phase or creates new ones.
+ * Builds fresh answer cards from server data instead of cloning from hidden voting grid.
+ * @param {Array} answersData - Array of answer objects from server
  */
-function initializeResultsSequence() {
-  console.log('[ResultsScreen] initializeResultsSequence called');
-  // Get answers from voting phase
-  const answersGrid = document.getElementById('answersGrid');
-  const answersRevealArea = document.getElementById('answersRevealArea');
+function initializeResultsSequence(answersData) {
+  console.log('[ResultsScreen] initializeResultsSequence called with answersData:', answersData);
+  console.log('[ResultsScreen] currentSequenceId:', currentSequenceId);
 
-  console.log('[ResultsScreen] answersGrid:', answersGrid);
-  console.log('[ResultsScreen] answersRevealArea:', answersRevealArea);
+  const answersRevealArea = document.getElementById('answersRevealArea');
 
   if (!answersRevealArea) {
     console.error('[ResultsScreen] answersRevealArea not found!');
     return;
   }
 
-  // If we have voting answers, copy them to results area
-  if (answersGrid) {
-    const answerCards = answersGrid.querySelectorAll('.answer-card');
-    console.log('[ResultsScreen] Found', answerCards.length, 'answer cards in voting grid');
+  // Clear previous answer elements
+  answersRevealArea.innerHTML = '';
+  answerElements.clear();
+  console.log('[ResultsScreen] Cleared previous answer elements');
 
-    answerCards.forEach((card) => {
-      const answerId = card.dataset.answerId;
-      console.log('[ResultsScreen] Processing card with answerId:', answerId);
+  // Build fresh answer cards from server data
+  if (answersData && answersData.length > 0) {
+    console.log('[ResultsScreen] Building', answersData.length, 'fresh cards from server data');
+    console.log('[ResultsScreen] Full answersData:', JSON.stringify(answersData, null, 2));
 
-      if (answerId && answerId !== 'correct') {
-        // Clone the card for results area
-        const clonedCard = card.cloneNode(true);
-        clonedCard.style.display = 'block';
-        clonedCard.style.margin = '20px auto';
-        clonedCard.style.maxWidth = '600px';
-        answersRevealArea.appendChild(clonedCard);
-        answerElements.set(answerId, clonedCard);
-        console.log('[ResultsScreen] Cloned card for answerId:', answerId);
-      } else {
-        console.log('[ResultsScreen] Skipping card (correct answer or no ID)');
-      }
+    answersData.forEach((answer) => {
+      // Create fresh card
+      const card = document.createElement('div');
+      card.className = 'answer-card';
+      card.dataset.answerId = answer.id;
+
+      // Create answer text element (matching voting screen structure)
+      const answerText = document.createElement('div');
+      answerText.textContent = answer.text;
+      answerText.style.flex = '1';
+      card.appendChild(answerText);
+
+      // Apply base styles
+      card.style.maxWidth = '600px';
+      card.style.display = 'block';
+      card.style.opacity = '1';
+
+      // Append to reveal area
+      answersRevealArea.appendChild(card);
+      answerElements.set(answer.id, card);
+      console.log(`[ResultsScreen] Created fresh card for answerId: ${answer.id}, text: "${answer.text.substring(0, 50)}"`);
     });
   } else {
-    console.error('[ResultsScreen] answersGrid not found!');
+    console.error('[ResultsScreen] No answers data provided!');
   }
 
-  console.log('[ResultsScreen] Total cloned cards:', answerElements.size);
+  console.log('[ResultsScreen] Total cards created:', answerElements.size);
+
+  // Debug: Check visibility of reveal area
+  if (answersRevealArea) {
+    console.log('[ResultsScreen] answersRevealArea display:', answersRevealArea.style.display);
+    console.log('[ResultsScreen] answersRevealArea offsetHeight:', answersRevealArea.offsetHeight);
+    console.log('[ResultsScreen] answersRevealArea children:', answersRevealArea.children.length);
+
+    // Check each created card
+    answerElements.forEach((element, answerId) => {
+      console.log(`[ResultsScreen] Card ${answerId}: display=${element.style.display}, opacity=${element.style.opacity}, offsetHeight=${element.offsetHeight}`);
+    });
+  }
 }
 
 /**
  * Handles the start of results sequence.
- * @param {object} data - Sequence data
+ * @param {object} data - Sequence data (includes answers array from server)
  */
 function handleResultsStartSequence(data) {
+  console.log('[ResultsScreen] ========== RESULTS SEQUENCE START ==========');
   console.log('[ResultsScreen] Results sequence started:', data);
+  console.log('[ResultsScreen] Previous currentSequenceId:', currentSequenceId);
+  console.log('[ResultsScreen] New sequenceId:', data.sequenceId);
+  console.log('[ResultsScreen] Answers data received:', data.answers);
+
+  // CRITICAL: Always accept new sequence and update ID
+  // This allows animations to work for all questions (1-8)
   currentSequenceId = data.sequenceId;
+  console.log('[ResultsScreen] currentSequenceId updated to:', currentSequenceId);
 
-  // Initialize results sequence (copy answers from voting phase)
+  // Initialize results sequence with answers data from server
   setTimeout(() => {
-    console.log('[ResultsScreen] Initializing results sequence...');
-    initializeResultsSequence();
+    console.log('[ResultsScreen] Initializing results sequence with server data...');
+    initializeResultsSequence(data.answers);
 
-    // Dim all answers initially
-    answerElements.forEach((element, answerId) => {
+    // Dim all answers initially (including correct answer)
+    answerElements.forEach((element) => {
       element.classList.add('answer-dimmed');
     });
-    console.log('[ResultsScreen] Dimmed', answerElements.size, 'answer elements');
+    console.log('[ResultsScreen] Dimmed all answer elements');
+    console.log('[ResultsScreen] ========== INITIALIZATION COMPLETE ==========');
   }, 100);
 }
 
@@ -160,10 +206,20 @@ function handleResultsStartSequence(data) {
  * @param {object} data - Highlight data
  */
 async function handleHighlightAnswer(data) {
-  if (data.sequenceId !== currentSequenceId) return;
+  console.log('[ResultsScreen] handleHighlightAnswer called');
+  console.log('[ResultsScreen] Event sequenceId:', data.sequenceId, 'Current sequenceId:', currentSequenceId);
 
+  if (data.sequenceId !== currentSequenceId) {
+    console.log('[ResultsScreen] SEQUENCE ID MISMATCH - IGNORING EVENT');
+    return;
+  }
+
+  console.log('[ResultsScreen] Highlighting answer:', data.answerId);
   const answerElement = answerElements.get(data.answerId);
-  if (!answerElement) return;
+  if (!answerElement) {
+    console.error('[ResultsScreen] Answer element not found for ID:', data.answerId);
+    return;
+  }
 
   currentAnswerElement = answerElement;
 
@@ -179,6 +235,7 @@ async function handleHighlightAnswer(data) {
   // Import and use animation function
   const { highlightAnswer } = await import('../animations/resultsAnimations.js');
   await highlightAnswer(answerElement);
+  console.log('[ResultsScreen] Highlight animation complete');
 }
 
 /**
@@ -243,53 +300,82 @@ function handleTransitionNext(data) {
 }
 
 /**
- * Handles correct answer buildup.
- * @param {object} data - Buildup data
+ * Handles "IT'S A LIE!" reveal for fake answers.
+ * @param {object} data - Lie reveal data
  */
-function handleCorrectAnswerBuild(data) {
-  if (data.sequenceId !== currentSequenceId) return;
+function handleRevealLie(data) {
+  if (data.sequenceId !== currentSequenceId || !currentAnswerElement) return;
 
-  const answersRevealArea = document.getElementById('answersRevealArea');
-  if (answersRevealArea) {
-    answersRevealArea.innerHTML = '<div class="correct-answer-buildup">AND THE TRUTH IS...</div>';
+  // Add "IT'S A LIE!" text above the answer
+  const lieRevealDiv = document.createElement('div');
+  lieRevealDiv.className = 'lie-reveal';
+  lieRevealDiv.textContent = `IT'S A LIE!`;
+
+  // Insert at the top of the current answer element
+  currentAnswerElement.insertBefore(lieRevealDiv, currentAnswerElement.firstChild);
+}
+
+/**
+ * Handles highlighting the correct answer.
+ * @param {object} data - Highlight data
+ */
+function handleHighlightCorrectAnswer(data) {
+  console.log('[ResultsScreen] handleHighlightCorrectAnswer called');
+  console.log('[ResultsScreen] Event sequenceId:', data.sequenceId, 'Current sequenceId:', currentSequenceId);
+
+  if (data.sequenceId !== currentSequenceId) {
+    console.log('[ResultsScreen] SEQUENCE ID MISMATCH - IGNORING EVENT');
+    return;
+  }
+
+  console.log('[ResultsScreen] Getting correct answer card from answerElements');
+  console.log('[ResultsScreen] answerElements keys:', Array.from(answerElements.keys()));
+
+  // Get the cloned correct answer card from answersRevealArea
+  const correctAnswerCard = answerElements.get('correct');
+  if (correctAnswerCard) {
+    console.log('[ResultsScreen] Found correct answer card, highlighting it');
+    // Show the card and highlight it
+    correctAnswerCard.style.display = 'block';
+    correctAnswerCard.classList.remove('answer-dimmed');
+    correctAnswerCard.classList.add('answer-highlighted');
+    currentAnswerElement = correctAnswerCard;
+    console.log('[ResultsScreen] Correct answer highlighted');
+  } else {
+    console.error('[ResultsScreen] Correct answer card NOT FOUND in answerElements!');
   }
 }
 
 /**
- * Handles correct answer reveal.
- * @param {object} data - Correct answer data
+ * Handles "THE TRUTH!" reveal for correct answer.
+ * @param {object} data - Truth reveal data
  */
-async function handleCorrectAnswerReveal(data) {
-  if (data.sequenceId !== currentSequenceId) return;
+function handleRevealTruth(data) {
+  if (data.sequenceId !== currentSequenceId || !currentAnswerElement) return;
 
-  const correctAnswerArea = document.getElementById('correctAnswerArea');
-  if (!correctAnswerArea) return;
+  // Add "THE TRUTH!" text above the answer
+  const truthRevealDiv = document.createElement('div');
+  truthRevealDiv.className = 'truth-reveal';
+  truthRevealDiv.textContent = 'THE TRUTH!';
 
-  correctAnswerArea.style.display = 'block';
-  correctAnswerArea.innerHTML = `
-    <div class="correct-answer-card" id="correctAnswerCard">
-      <div class="correct-answer-text">${data.answerText}</div>
-    </div>
-  `;
+  // Insert at the top of the current answer element
+  currentAnswerElement.insertBefore(truthRevealDiv, currentAnswerElement.firstChild);
 
-  const correctCard = document.getElementById('correctAnswerCard');
-  const { correctAnswerZoom } = await import('../animations/resultsAnimations.js');
-  await correctAnswerZoom(correctCard);
+  // Apply the zoom animation
+  currentAnswerElement.classList.add('correct-answer-zoom');
 }
+
 
 /**
  * Handles showing correct voters.
  * @param {object} data - Correct voters data
  */
 function handleShowCorrectVoters(data) {
-  if (data.sequenceId !== currentSequenceId) return;
-
-  const correctAnswerArea = document.getElementById('correctAnswerArea');
-  if (!correctAnswerArea) return;
+  if (data.sequenceId !== currentSequenceId || !currentAnswerElement) return;
 
   const votersContainer = document.createElement('div');
   votersContainer.className = 'correct-voters-container';
-  
+
   if (data.voters.length === 0) {
     votersContainer.innerHTML = '<div class="no-correct-voters">Everyone was fooled!</div>';
   } else {
@@ -312,7 +398,7 @@ function handleShowCorrectVoters(data) {
     votersContainer.appendChild(votersList);
   }
 
-  correctAnswerArea.appendChild(votersContainer);
+  currentAnswerElement.appendChild(votersContainer);
 }
 
 /**
