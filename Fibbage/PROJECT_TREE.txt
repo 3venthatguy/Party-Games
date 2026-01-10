@@ -1,0 +1,130 @@
+Economics Fibbage - Project Structure
+=====================================
+
+economics-fibbage/
+│
+├── 📄 README.md
+├── 📄 REFACTORING_SUMMARY.md          # Quick reference guide
+├── 📄 FILE_STRUCTURE.md               # Complete file documentation
+├── 📄 REFACTORING_COMPLETE.md         # Before/after comparison
+├── 📄 PROJECT_TREE.txt                # This file - visual tree
+├── 📦 package.json
+│
+├── 🗂️  backup-original-files/          # Original monolithic files (archived)
+│   ├── host.js (305 lines)
+│   ├── player.js (379 lines)
+│   └── questions.js (59 lines)
+│
+├── 🖥️  server/                         # SERVER-SIDE CODE (19 files)
+│   │
+│   ├── 🚀 server.js                   # Main entry point (65 lines)
+│   ├── ⚙️  config.js                   # All configuration (39 lines)
+│   ├── 🎮 gameManager.js              # Room manager (274 lines)
+│   │
+│   ├── 🌐 routes/                     # Express routes
+│   │   └── index.js                   # Static files & routes (17 lines)
+│   │
+│   ├── 🔌 socket/                     # Socket.io handlers
+│   │   ├── socketHandler.js          # Main socket setup (23 lines)
+│   │   ├── timerBroadcast.js         # Timer broadcasts (103 lines)
+│   │   │
+│   │   └── events/                   # Socket event handlers
+│   │       ├── connectionEvents.js   # Connect/disconnect (31 lines)
+│   │       ├── roomEvents.js         # createRoom, joinRoom (54 lines)
+│   │       ├── gameEvents.js         # startGame, nextQuestion (93 lines)
+│   │       └── playerEvents.js       # submitAnswer, submitVote (90 lines)
+│   │
+│   ├── 🎲 game/                       # Game logic classes
+│   │   ├── GameRoom.js               # Room orchestrator (248 lines)
+│   │   ├── Player.js                 # Player model (61 lines)
+│   │   ├── GameState.js              # State management (139 lines)
+│   │   ├── Timer.js                  # Timer logic (42 lines)
+│   │   ├── ScoreCalculator.js        # Scoring (65 lines)
+│   │   └── AnswerManager.js          # Answer utilities (50 lines)
+│   │
+│   ├── 🛠️  utils/                      # Utility functions
+│   │   ├── logger.js                 # Logging (80 lines)
+│   │   ├── validation.js             # Input validation (43 lines)
+│   │   └── roomCodeGenerator.js      # Room codes (23 lines)
+│   │
+│   └── 📊 data/                       # Data files
+│       └── questions.js              # Economics questions (59 lines)
+│
+└── 🌐 public/                         # CLIENT-SIDE CODE (20 files)
+    │
+    ├── 🖼️  host.html                   # Host screen HTML
+    ├── 🖼️  player.html                 # Player screen HTML
+    │
+    ├── 🎨 css/
+    │   ├── host.css                  # Host styles
+    │   └── player.css                # Player styles
+    │
+    └── 💻 js/
+        │
+        ├── 🎯 host/                   # HOST JAVASCRIPT (10 files)
+        │   ├── hostMain.js           # Initialization (52 lines)
+        │   ├── socketHandlers.js     # Socket listeners (87 lines)
+        │   │
+        │   ├── screens/              # Screen modules
+        │   │   ├── lobbyScreen.js    # Lobby UI (22 lines)
+        │   │   ├── submitScreen.js   # Submit phase (58 lines)
+        │   │   ├── votingScreen.js   # Voting phase (37 lines)
+        │   │   ├── resultsScreen.js  # Results phase (58 lines)
+        │   │   └── gameOverScreen.js # Game over (53 lines)
+        │   │
+        │   └── ui/                   # UI utilities
+        │       ├── uiUpdater.js      # DOM manipulation (93 lines)
+        │       └── timer.js          # Timer display (15 lines)
+        │
+        └── 👤 player/                 # PLAYER JAVASCRIPT (10 files)
+            ├── playerMain.js         # Initialization (37 lines)
+            ├── socketHandlers.js     # Socket listeners (99 lines)
+            │
+            ├── screens/              # Screen modules
+            │   ├── joinScreen.js     # Join screen (70 lines)
+            │   ├── lobbyScreen.js    # Lobby UI (22 lines)
+            │   ├── submitScreen.js   # Submit phase (97 lines)
+            │   ├── votingScreen.js   # Voting phase (76 lines)
+            │   ├── resultsScreen.js  # Results phase (48 lines)
+            │   └── gameOverScreen.js # Game over (71 lines)
+            │
+            └── ui/                   # UI utilities
+                ├── uiUpdater.js      # DOM manipulation (82 lines)
+                └── timer.js          # Timer display (16 lines)
+
+
+QUICK REFERENCE
+===============
+
+Need to fix...              Look in...
+──────────────────────────  ────────────────────────────────────────
+🔧 Game settings            server/config.js
+🔧 Room creation            server/socket/events/roomEvents.js
+🔧 Player joining           server/socket/events/roomEvents.js
+🔧 Game start               server/socket/events/gameEvents.js
+🔧 Answer submission        server/socket/events/playerEvents.js
+🔧 Voting                   server/socket/events/playerEvents.js
+🔧 Scoring                  server/game/ScoreCalculator.js
+🔧 Timer logic              server/game/Timer.js
+🔧 Host lobby UI            public/js/host/screens/lobbyScreen.js
+🔧 Host voting UI           public/js/host/screens/votingScreen.js
+🔧 Host results UI          public/js/host/screens/resultsScreen.js
+🔧 Player join UI           public/js/player/screens/joinScreen.js
+🔧 Player voting UI         public/js/player/screens/votingScreen.js
+🔧 Player results UI        public/js/player/screens/resultsScreen.js
+🔧 Questions                server/data/questions.js
+
+
+FILE COUNT
+==========
+
+Server-side:    19 files
+Client-side:    20 files
+Documentation:   5 files (including this tree)
+HTML/CSS:        4 files
+────────────────────────
+Total:          48 files
+
+Current:        48 modular files (organized, documented)
+
+Improvement:    860% more files, 51% fewer lines per file

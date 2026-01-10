@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Economics Fibbage - Host</title>
+  <link rel="stylesheet" href="css/host.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Lobby Screen -->
+    <div id="lobbyScreen" class="lobby-screen active">
+      <h1 style="font-size: 48px; margin-bottom: 20px;">Economics Fibbage</h1>
+      <div class="room-code-display" id="roomCodeDisplay">----</div>
+      <div class="player-count" id="playerCount">Waiting for players...</div>
+      <div class="players-grid" id="playersGrid"></div>
+      <button class="start-button" id="startButton" disabled>Start Game</button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="gameScreen" class="game-screen">
+      <div class="question-number" id="questionNumber">Question 1 of 8</div>
+      <div class="timer-display" id="timerDisplay">30</div>
+      <div class="question-display" id="questionDisplay"></div>
+
+      <!-- Submit Phase -->
+      <div id="submitPhase" class="submit-phase" style="display: none;">
+        <div class="submit-status" id="submitStatus">Players are submitting answers...</div>
+        <div class="submit-checkmarks" id="submitCheckmarks"></div>
+      </div>
+
+      <!-- Voting Phase -->
+      <div id="votingPhase" class="voting-phase" style="display: none;">
+        <h2 style="font-size: 36px; margin-bottom: 30px;">Vote for the correct answer!</h2>
+        <div class="answers-grid" id="answersGrid"></div>
+      </div>
+
+      <!-- Results Phase -->
+      <div id="resultsPhase" class="results-phase" style="display: none;">
+        <div class="correct-answer-reveal" id="correctAnswerReveal"></div>
+        <div class="explanation" id="explanation"></div>
+        <div class="fooled-breakdown" id="fooledBreakdown"></div>
+        <div class="leaderboard" id="leaderboard"></div>
+        <button class="next-button" id="nextButton">Next Question</button>
+      </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="game-over-screen">
+      <h1 style="font-size: 64px; margin-bottom: 20px;">Game Over!</h1>
+      <div class="winner-celebration" id="winnerCelebration"></div>
+      <div class="final-leaderboard" id="finalLeaderboard"></div>
+      <button class="play-again-button" id="playAgainButton">Play Again</button>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" id="errorMessage"></div>
+  </div>
+
+  <!-- UI Utilities -->
+  <script src="js/host/ui/uiUpdater.js"></script>
+  <script src="js/host/ui/timer.js"></script>
+
+  <!-- Screen Modules -->
+  <script src="js/host/screens/lobbyScreen.js"></script>
+  <script src="js/host/screens/submitScreen.js"></script>
+  <script src="js/host/screens/votingScreen.js"></script>
+  <script src="js/host/screens/resultsScreen.js"></script>
+  <script src="js/host/screens/gameOverScreen.js"></script>
+
+  <!-- Socket Handlers -->
+  <script src="js/host/socketHandlers.js"></script>
+
+  <!-- Main Initialization -->
+  <script src="js/host/hostMain.js"></script>
+</body>
+</html>
