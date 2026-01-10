@@ -317,6 +317,17 @@
   max-width: 800px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   animation: explanationFadeIn 0.5s ease-out;
+  color: #1f2937; /* Dark text for readability */
+}
+
+.explanation-box h3 {
+  color: #1f2937;
+  margin-bottom: 15px;
+}
+
+.explanation-box p {
+  color: #374151;
+  line-height: 1.6;
 }
 
 @keyframes explanationFadeIn {
@@ -343,7 +354,8 @@
   margin-bottom: 40px;
 }
 
-.answer-card {
+/* Results phase answer cards - ensure dark text on light background */
+.results-phase .answer-card {
   background: white;
   border: 2px solid #e5e7eb;
   border-radius: 12px;
@@ -352,6 +364,7 @@
   max-width: 600px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  color: #1f2937; /* Dark text for readability */
 }
 
 .voters-container {
