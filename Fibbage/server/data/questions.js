@@ -14,32 +14,32 @@ const questions = [
   },
   {
     id: 3,
-    question: "Venezuela's inflation rate in 2018 reached an estimated _____ percent.",
+    question: "Venezuela's inflation rate in 2018 reached an estimated _____%.",
     answer: "130,060",
     explanation: "Venezuela experienced one of the worst hyperinflations in modern history."
   },
   {
     id: 4,
-    question: "The 2008 financial crisis caused the U.S. to lose approximately _____ in household wealth.",
-    answer: "$16 trillion",
-    explanation: "Between 2007 and 2009, American households lost approximately $16 trillion in net worth."
+    question: "The _____ production function, commonly used in growth models like Solow-Swan, takes the form Y = A K^α L^(1-α), where α represents the capital share of income.", 
+    answer: "Cobb-Douglas", 
+    explanation: "Named after Charles Cobb and Paul Douglas, this functional form exhibits constant returns to scale and diminishing marginal returns, making it a standard tool in empirical macroeconomics and growth theory." 
   },
   {
     id: 5,
-    question: "In 1980, the Federal Reserve raised interest rates to _____ percent to fight inflation.",
-    answer: "20",
+    question: "In 1980, Fed Chairman _____ raised interest rates to 20% to fight inflation.",
+    answer: "Paul Volcker",
     explanation: "Fed Chairman Paul Volcker raised rates to nearly 20% to break the back of double-digit inflation."
   },
   {
     id: 6,
-    question: "China's economy grew by an average of _____ percent per year from 1978 to 2018.",
+    question: "China's economy grew by an average of _____% per year from 1978 to 2018.",
     answer: "9.5",
     explanation: "China achieved the most rapid sustained expansion by a major economy in history."
   },
   {
     id: 7,
-    question: "The 1929 stock market crash saw the Dow Jones lose _____ percent of its value by 1932.",
-    answer: "89",
+    question: "The 1929 stock market crash saw the _____ stock index to lose 89% of its value by 1932.",
+    answer: "Dow Jones",
     explanation: "The Dow peaked at 381.17 in 1929 and bottomed at 41.22 in 1932."
   },
   {
@@ -86,13 +86,13 @@ const questions = [
 	},
   {
     id: 15,
-    question: "The Beanie Baby craze of the 1990s saw some collectors paying over $_____ for a single stuffed animal.",
-    answer: "5,000",
+    question: "The _____ craze of the 1990s saw some collectors paying over $5,000 for a single stuffed animal.",
+    answer: "Beanie Baby",
     explanation: "At the height of Beanie Baby mania, rare specimens like 'Princess the Bear' sold for thousands. People treated them as serious investments, storing them in climate-controlled rooms."
   },
   {
     id: 16,
-    question: "During the 17th century, the ____ Company was the first company to issue stocks to the public.",
+    question: "During the 17th century, the _____ Company was the first company to issue stocks to the public.",
     answer: "Dutch East India",
     explanation: "The Dutch East India Company pioneered the concept of publicly traded shares, allowing investors to buy ownership stakes."
   },
@@ -128,8 +128,8 @@ const questions = [
   },
   {
     id: 22,
-    question: "The first recorded stock market crash occurred in 1637 in which country?",
-    answer: "Netherlands",
+    question: "The country that saw the first recorded stock market crash in 1637 was _____?",
+    answer: "the Netherlands",
     explanation: "The Dutch Tulip Mania bubble burst in 1637, leading to the first recorded stock market crash in history."
   },
   {
@@ -146,8 +146,8 @@ const questions = [
   },
   {
     id: 25,
-    question: "In 2010, a programmer famously bought two pizzas for _____ Bitcoin, now worth over $600 million.",
-    answer: "10,000",
+    question: "In 2010, a programmer famously bought two pizzas for 10,000 _____, now worth over $600 million.",
+    answer: "Bitcoin",
     explanation: "On May 22, 2010, Laszlo Hanyecz made the first real-world transaction using Bitcoin by purchasing two pizzas for 10,000 BTC, which would be worth hundreds of millions today."
   },
   {
@@ -167,6 +167,90 @@ const questions = [
     question: "In the 21st century after the natural disaster known as _____, insurance companies paid out approximately $41 billion in claims, the costliest natural disaster in U.S. history.",
 		answer: "Hurricane Katrina",
 		explanation: "Katrina's insurance payouts bankrupted several insurers and caused many to stop offering coverage in coastal areas. The disaster fundamentally changed how insurance companies assess climate risk and price policies."
+  },
+  { 
+    id: 29,
+    question: "In the Ramsey-Cass-Koopmans model, households optimize lifetime utility by choosing consumption and saving paths, leading to a steady-state growth rate determined by the rate of _____ progress.", 
+    answer: "technological", 
+    explanation: "This optimal growth model incorporates forward-looking consumers and a social planner, showing that the economy converges to a balanced growth path where consumption and capital grow at the exogenous rate of technological progress." 
+  },
+  { 
+    id: 30,
+    question: "The _____ model, also known as the aggregate demand-aggregate supply model, is widely used to explain fluctuations in output and price levels, including short-run effects of demand shocks and long-run neutrality of money.", 
+    answer: "AD-AS", 
+    explanation: "The AD-AS model depicts how shifts in aggregate demand or supply affect real GDP and the price level, with the vertical long-run aggregate supply curve reflecting classical assumptions of full employment and flexible prices." 
+  },
+  { 
+    id: 31,
+    question: "The IS-LM model, developed by John Hicks in 1937, illustrates the short-run equilibrium between _____ by combining the investment-saving (IS) curve with the liquidity preference-money supply (LM) curve.", 
+    answer: "interest rates and output", 
+    explanation: "The IS-LM model is a foundational Keynesian framework used to analyze the interaction between the goods market and money market, helping explain how fiscal and monetary policy affect interest rates and aggregate output in a closed economy." 
+  },
+  { 
+    id: 32,
+    question: "A business should shut down in the short run if the price it receives is less than its _____, because it cannot even cover its variable costs.", 
+    answer: "average variable cost", 
+    explanation: "In microeconomic reasoning, the shutdown rule states that if price < AVC, losses are minimized by producing nothing rather than continuing to incur avoidable variable costs." 
+  },
+  { 
+    id: 33,
+    question: "Rational consumers _____ subject to the constraint of their income and the prices they face, leading them to equate the marginal utility per dollar across all goods.", 
+    answer: "maximimize their utility", 
+    explanation: "The utility-maximization rule (MUx/Px = MUy/Py = …) is the core of consumer choice theory and explains how people allocate limited budgets among competing wants." 
+  },
+  { 
+    id: 34,
+    question: "The infamous 'Mississippi Bubble' of 1719 was masterminded by Scottish con-man John Law, who convinced the French government that printing endless money backed by _____ in Louisiana would make everyone rich.", 
+    answer: "swamp land", 
+    explanation: "Law sold the French aristocracy on the idea that mosquito-infested, alligator-filled bayous were the next gold rush. The bubble popped so hard it helped cause the French Revolution." 
+  },
+  { 
+    id: 35,
+    question: "In 1980s Britain, the 'Big Bang' financial deregulation led to so much cocaine-fueled trading that dealers started accepting _____ as payment from stressed-out yuppies on the trading floor.", 
+    answer: "share certificates", 
+    explanation: "For a brief period in the late 80s, powdered Peruvian marching powder was like a secondary currency in the City of London. Peak Thatcher-era degeneracy." 
+  },
+  { 
+    id: 36,
+    question: "The 1997 Asian Financial Crisis was partially triggered when Thai Prime Minister Chavalit Yongchaiyudh appeared on TV looking _____ while denying the baht would be devalued—causing everyone to panic-sell immediately.", 
+    answer: "sweaty and nervous", 
+    explanation: "The 'sweaty PM' moment is now studied in behavioral finance. Body language moved more money than the IMF that week." 
+  },
+  { 
+    id: 37,
+    question: "In 2008-2009 Iceland, after the banking collapse, citizens jokingly started a campaign to make their new prime minister the world's first '_____ of the nation' because she was the only politician who hadn't screwed them.", 
+    answer: "lesbian", 
+    explanation: "Jóhanna Sigurðardóttir became the world's first openly lesbian head of government. Icelanders' dark humor during bankruptcy was world-class." 
+  },
+  { 
+    id: 38,
+    question: "Since the 1900, ____ freed up 4-6 hours weekly per household, boosting women's workforce participation by 50%.", 
+    answer: "washing machines", 
+    explanation: "For high demand services in such as cleaning laundry, technological innovations allowed for vastly lower labor input costs."
+  },
+  { 
+    id: 39,
+    question: "The very first known 'minimum wage law' in history appears in the _____ Code (c. 1750 BCE), which set fixed daily wages in barley for different professions, including surgeons and ox drivers.", 
+    answer: "Hammurabi's", 
+    explanation: "If a builder's house collapsed and killed the owner, the builder was put to death. But if it only killed the owner's son? The builder's son got executed." 
+  },
+  { 
+    id: 40,
+    question: "The earliest known use of the word 'debt' in any language appears in Sumerian texts as _____.", 
+    answer: "mas", 
+    explanation: "'Mas', translated as 'neck-stock', was used because defaulting debtors could be literally collared like animals. If you couldn't pay, they put a wooden neck-stock on you until someone else bought your labor. Ancient creditors did not mess around." 
+  },
+  { 
+    id: 41,
+    question: "The first known use of 'futures contracts' appears in ancient Mesopotamia, where merchants agreed to deliver _____ at a fixed price after the harvest, hedging against price drops.", 
+    answer: "dates", 
+    explanation: "Date futures were the original commodity derivatives. Ancient risk management tasted very sweet." 
+  },
+  { 
+    id: 42,
+    question: "The Roman Republic's first known financial crisis (c. 352 BCE) was solved by creating a public debt registry and allowing debtors to pay off loans by surrendering _____ instead of land.", 
+    answer: "their freedom", 
+    explanation: "Debt bondage was so common they basically legalized voluntary temporary slavery as a repayment option. Ancient debt-relief had strings attached." 
   }
 ];
 
