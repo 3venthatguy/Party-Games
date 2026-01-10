@@ -12,20 +12,32 @@ function setupPlayerSocketHandlers(socket, state) {
     const { players } = data;
     updatePlayersList(players);
 
-    // Find our player ID
-    const ourPlayer = players.find(p => p.name === state.playerName);
-    if (ourPlayer) {
-      state.playerId = ourPlayer.id;
+    // Find our player ID - only if we don't have it yet
+    if (!state.playerId && state.playerName) {
+      const ourPlayer = players.find(p => p.name === state.playerName);
+
+      if (ourPlayer) {
+        state.playerId = ourPlayer.id;
+
+        // Show player name badge and lobby screen only for the joining player
+        showPlayerNameBadge(state.playerName);
+        showPlayerLobbyScreen(state.roomCode);
+      }
     }
-
-    // Show player name badge
-    showPlayerNameBadge(state.playerName);
-
-    // Show lobby screen
-    showPlayerLobbyScreen(state.roomCode);
   });
 
   socket.on('gameState', (data) => {
+    // Set player ID if provided (when joining)
+    if (data.playerId) {
+      state.playerId = data.playerId;
+
+      // Show player name badge and lobby screen when joining
+      if (state.playerName && state.roomCode) {
+        showPlayerNameBadge(state.playerName);
+        showPlayerLobbyScreen(state.roomCode);
+      }
+    }
+
     // Handle reconnection or late join
     if (data.phase !== 'lobby') {
       showPlayerError('Game already in progress. Please wait for the next game.');
@@ -57,6 +69,12 @@ function setupPlayerSocketHandlers(socket, state) {
     gameScreen.classList.add('active');
     gameOverScreen.classList.remove('active');
 
+    // Hide watch screen if it was showing
+    const watchScreen = document.getElementById('watchScreen');
+    if (watchScreen) {
+      watchScreen.style.display = 'none';
+    }
+
     // Reset phases
     showPlayerSubmitPhase();
 
@@ -73,6 +91,7 @@ function setupPlayerSocketHandlers(socket, state) {
       showPlayerVotingPhase();
     } else if (data.phase === 'results') {
       showPlayerResultsPhase();
+      hidePlayerTimer(); // Hide timer during results animation
     }
 
     updatePlayerTimer(data.timeRemaining);
@@ -91,7 +110,9 @@ function setupPlayerSocketHandlers(socket, state) {
     displayPlayerVotingAnswers(answers, state.playerId, (votedForId) => {
       socket.emit('submitVote', { roomCode: state.roomCode, votedForId });
       state.submittedVote = true;
-      showVotingWaiting();
+
+      // Immediately show watch screen - direct player to look at TV
+      showWatchScreen();
     });
   });
 
@@ -147,6 +168,13 @@ function setupPlayerSocketHandlers(socket, state) {
 
   socket.on('gameOver', (data) => {
     const { finalScores } = data;
+
+    // Hide watch screen if showing
+    const watchScreen = document.getElementById('watchScreen');
+    if (watchScreen) {
+      watchScreen.style.display = 'none';
+    }
+
     showPlayerGameOverScreen(finalScores, state.playerId);
   });
 

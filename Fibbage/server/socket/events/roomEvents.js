@@ -44,11 +44,12 @@ function setupRoomEvents(io, socket, gameManager) {
         players: gameState.getPlayersClientData()
       });
 
-      // Send current game state to the new player
+      // Send current game state AND player ID to the new player
       socket.emit('gameState', {
         phase: gameState.phase,
         currentQuestionIndex: gameState.currentQuestionIndex,
-        totalQuestions: gameState.selectedQuestionIds.length || 8
+        totalQuestions: gameState.selectedQuestionIds.length || 8,
+        playerId: player.id  // Include the player's own ID
       });
     } catch (error) {
       socket.emit('error', error.message);

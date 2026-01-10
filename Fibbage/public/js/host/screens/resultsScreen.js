@@ -24,10 +24,21 @@ function showResultsPhase() {
   const submitPhase = document.getElementById('submitPhase');
   const votingPhase = document.getElementById('votingPhase');
   const resultsPhase = document.getElementById('resultsPhase');
+  const questionDisplay = document.getElementById('questionDisplay');
+  const questionNumber = document.getElementById('questionNumber');
 
   submitPhase.style.display = 'none';
   votingPhase.style.display = 'none';
   resultsPhase.style.display = 'block';
+
+  // Keep question visible during results animation
+  if (questionDisplay) {
+    questionDisplay.style.display = 'block';
+  }
+  if (questionNumber) {
+    questionNumber.style.display = 'block';
+  }
+
   console.log('[ResultsScreen] Results phase UI updated');
 
   // Clear previous results but preserve structure

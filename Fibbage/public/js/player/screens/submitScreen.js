@@ -42,13 +42,29 @@ function setupSubmitScreen(onSubmit) {
 function showPlayerSubmitPhase() {
   const submitPhase = document.getElementById('submitPhase');
   const votingPhase = document.getElementById('votingPhase');
-  const resultsPhase = document.getElementById('resultsPhase');
+  const watchScreen = document.getElementById('watchScreen');
   const submitWaiting = document.getElementById('submitWaiting');
+  const questionDisplay = document.getElementById('questionDisplay');
+  const questionNumber = document.getElementById('questionNumber');
+  const timerDisplay = document.getElementById('timerDisplay');
 
   submitPhase.style.display = 'block';
   votingPhase.style.display = 'none';
-  resultsPhase.style.display = 'none';
+  if (watchScreen) {
+    watchScreen.style.display = 'none';
+  }
   submitWaiting.style.display = 'none';
+
+  // Show question, question number, and timer
+  if (questionDisplay) {
+    questionDisplay.style.display = 'block';
+  }
+  if (questionNumber) {
+    questionNumber.style.display = 'block';
+  }
+  if (timerDisplay) {
+    timerDisplay.style.display = 'block';
+  }
 }
 
 /**

@@ -38,6 +38,10 @@ function setupHostSocketHandlers(socket, state) {
     questionDisplay.textContent = question;
     questionNumber.textContent = `Question ${questionIndex + 1} of ${totalQuestions}`;
 
+    // Show question elements (in case they were hidden during results)
+    questionDisplay.style.display = 'block';
+    questionNumber.style.display = 'block';
+
     // Show game screen
     hideLobbyScreen();
     const gameScreen = document.getElementById('gameScreen');
@@ -64,6 +68,7 @@ function setupHostSocketHandlers(socket, state) {
     } else if (data.phase === 'results') {
       console.log('[SocketHandlers] Showing results phase...');
       showResultsPhase();
+      hideTimer(); // Hide timer during results animation
     }
 
     updateTimer(data.timeRemaining);

@@ -8,12 +8,14 @@
 function showPlayerVotingPhase() {
   const submitPhase = document.getElementById('submitPhase');
   const votingPhase = document.getElementById('votingPhase');
-  const resultsPhase = document.getElementById('resultsPhase');
+  const watchScreen = document.getElementById('watchScreen');
   const votingWaiting = document.getElementById('votingWaiting');
 
   submitPhase.style.display = 'none';
   votingPhase.style.display = 'block';
-  resultsPhase.style.display = 'none';
+  if (watchScreen) {
+    watchScreen.style.display = 'none';
+  }
   votingWaiting.style.display = 'none';
 }
 
@@ -27,7 +29,7 @@ function displayPlayerVotingAnswers(answers, playerId, onVote) {
   const answersList = document.getElementById('answersList');
   answersList.innerHTML = '';
 
-  // Filter out the player's own answer
+  // Filter out the player's own answer - they should not see it at all
   const votableAnswers = answers.filter(answer => answer.id !== playerId);
 
   votableAnswers.forEach((answer) => {
@@ -68,4 +70,32 @@ function showVotingWaiting() {
   answersList.querySelectorAll('.answer-button').forEach(btn => {
     btn.disabled = true;
   });
+}
+
+/**
+ * Shows the watch screen after voting.
+ * Immediately directs player to look at main screen.
+ */
+function showWatchScreen() {
+  const submitPhase = document.getElementById('submitPhase');
+  const votingPhase = document.getElementById('votingPhase');
+  const watchScreen = document.getElementById('watchScreen');
+  const questionDisplay = document.getElementById('questionDisplay');
+  const questionNumber = document.getElementById('questionNumber');
+  const timerDisplay = document.getElementById('timerDisplay');
+
+  submitPhase.style.display = 'none';
+  votingPhase.style.display = 'none';
+  watchScreen.style.display = 'flex';
+
+  // Hide question, question number, and timer on watch screen
+  if (questionDisplay) {
+    questionDisplay.style.display = 'none';
+  }
+  if (questionNumber) {
+    questionNumber.style.display = 'none';
+  }
+  if (timerDisplay) {
+    timerDisplay.style.display = 'none';
+  }
 }
