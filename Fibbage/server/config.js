@@ -34,5 +34,22 @@ module.exports = {
   FOOL_PLAYER_POINTS: 500,
 
   // Timer broadcast interval
-  TIMER_BROADCAST_INTERVAL: 1000
+  TIMER_BROADCAST_INTERVAL: 1000,
+
+  // Results animation timings (in milliseconds)
+  RESULTS_ANIMATION_TIMINGS: {
+    answerHighlight: 500,
+    voterAppearStagger: 200,
+    authorRevealPause: 500,
+    authorRevealDuration: 1000,
+    scoreAnimationDuration: 1000,
+    reactionPause: 500,
+    transitionDuration: 300,
+    correctAnswerBuildUp: 2000,
+    correctAnswerReveal: 1000,
+    correctVoterAppearStagger: 200,
+    explanationDisplay: 4000,
+    scoreboardAnimation: 2000,
+    betweenAnswers: 300
+  }
 };

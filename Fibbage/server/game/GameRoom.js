@@ -189,15 +189,24 @@ class GameRoom {
       logVoteSubmitted(player.name, votedFor ? votedFor.name : 'unknown', this.gameState.roomCode);
     }
 
+    // Check if all players have voted - if so, transition to results
+    if (this.gameState.isVotingPhaseComplete()) {
+      this.gameState.setPhase('results');
+      logPhaseTransition(this.gameState.roomCode, 'results');
+    }
+
     return this.gameState;
   }
 
   /**
    * Calculates results for the current round.
+   * NOTE: This does NOT change the game phase. The caller is responsible for
+   * transitioning to the results phase at the appropriate time.
    * @returns {object} Results data
    */
   calculateResults() {
-    this.gameState.setPhase('results');
+    // Do NOT set phase here - let the caller control phase transitions
+    // this.gameState.setPhase('results');
     const results = calculateResults(this.gameState);
     logResults(this.gameState.roomCode);
     return results;

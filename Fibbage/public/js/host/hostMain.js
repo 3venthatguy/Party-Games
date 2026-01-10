@@ -35,6 +35,7 @@ function initializeHost() {
  * Creates a new game room.
  */
 function createRoom() {
+  console.log('Emitting createRoom event...');
   socket.emit('createRoom');
 }
 
@@ -46,16 +47,22 @@ function setupButtonHandlers() {
   const nextButton = document.getElementById('nextButton');
   const playAgainButton = document.getElementById('playAgainButton');
 
-  startButton.addEventListener('click', () => {
-    socket.emit('startGame', { roomCode: hostState.roomCode });
-    startButton.disabled = true;
-  });
+  if (startButton) {
+    startButton.addEventListener('click', () => {
+      socket.emit('startGame', { roomCode: hostState.roomCode });
+      startButton.disabled = true;
+    });
+  }
 
-  nextButton.addEventListener('click', () => {
-    socket.emit('nextQuestion', { roomCode: hostState.roomCode });
-  });
+  if (nextButton) {
+    nextButton.addEventListener('click', () => {
+      socket.emit('nextQuestion', { roomCode: hostState.roomCode });
+    });
+  }
 
-  playAgainButton.addEventListener('click', () => {
-    location.reload();
-  });
+  if (playAgainButton) {
+    playAgainButton.addEventListener('click', () => {
+      location.reload();
+    });
+  }
 }

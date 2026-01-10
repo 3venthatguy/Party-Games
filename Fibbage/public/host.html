@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Economics Fibbage - Host</title>
   <link rel="stylesheet" href="css/host.css">
+  <link rel="stylesheet" href="css/host-animations.css">
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
@@ -38,11 +39,7 @@
 
       <!-- Results Phase -->
       <div id="resultsPhase" class="results-phase" style="display: none;">
-        <div class="correct-answer-reveal" id="correctAnswerReveal"></div>
-        <div class="explanation" id="explanation"></div>
-        <div class="fooled-breakdown" id="fooledBreakdown"></div>
-        <div class="leaderboard" id="leaderboard"></div>
-        <button class="next-button" id="nextButton">Next Question</button>
+        <!-- Results container will be dynamically created by resultsScreen.js -->
       </div>
     </div>
 

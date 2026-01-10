@@ -50,6 +50,7 @@ function handleSubmitPhaseExpiry(io, roomCode, gameState, gameManager, timerInte
       answers: shuffledAnswers.map(a => ({ id: a.id, text: a.text }))
     });
 
+    console.log('[TimerBroadcast] Emitting phaseChange to voting (submit phase expired)');
     io.to(roomCode).emit('phaseChange', {
       phase: 'voting',
       timeRemaining: config.VOTING_PHASE_DURATION
@@ -65,12 +66,17 @@ function handleSubmitPhaseExpiry(io, roomCode, gameState, gameManager, timerInte
  * Handles timer expiry during voting phase.
  */
 function handleVotingPhaseExpiry(io, roomCode, gameState, gameManager, timerInterval) {
-  // Transition to results
+  console.log('[TimerBroadcast] Voting phase expired, transitioning to results');
+
+  // Transition to results phase
+  gameState.setPhase('results');
+
   if (Object.keys(gameState.votes).length > 0) {
-    const results = gameManager.calculateResults(gameState);
-    io.to(roomCode).emit('resultsReady', results);
+    // Start results animation sequence
+    const { startResultsAnimation } = require('./events/resultsEvents');
+    startResultsAnimation(io, roomCode, gameManager);
   } else {
-    gameState.setPhase('results');
+    console.log('[TimerBroadcast] No votes submitted, auto-advancing to next question');
     // Auto-advance if no votes
     setTimeout(() => {
       try {

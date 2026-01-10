@@ -14,10 +14,14 @@ function setupRoomEvents(io, socket, gameManager) {
   // Create a new room
   socket.on('createRoom', () => {
     try {
+      console.log('createRoom event received from socket:', socket.id);
       const roomCode = gameManager.createRoom(socket.id);
+      console.log('Room created with code:', roomCode);
       socket.emit('roomCreated', roomCode);
+      console.log('roomCreated event emitted with code:', roomCode);
       socket.join(roomCode);
     } catch (error) {
+      console.error('Error creating room:', error);
       socket.emit('error', error.message);
       logError('creating room', error);
     }

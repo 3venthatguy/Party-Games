@@ -39,6 +39,7 @@ function setupPlayerEvents(io, socket, gameManager) {
             answers: shuffledAnswers.map(a => ({ id: a.id, text: a.text }))
           });
 
+          console.log('[PlayerEvents] Emitting phaseChange to voting (all answers submitted)');
           io.to(roomCode).emit('phaseChange', {
             phase: 'voting',
             timeRemaining: config.VOTING_PHASE_DURATION
@@ -70,13 +71,15 @@ function setupPlayerEvents(io, socket, gameManager) {
         votedForId: votedForId
       });
 
-      // If all voted, calculate and send results
+      // If all voted, calculate and start results animation
       if (gameState.phase === 'results') {
-        const results = gameManager.calculateResults(gameState);
-        console.log('Sending resultsReady with data:', JSON.stringify(results, null, 2));
+        console.log('[PlayerEvents] All votes submitted, transitioning to results phase');
+        const { startResultsAnimation } = require('./resultsEvents');
 
         setTimeout(() => {
-          io.to(roomCode).emit('resultsReady', results);
+          console.log('[PlayerEvents] Starting results animation after delay');
+          // Start animated results sequence
+          startResultsAnimation(io, roomCode, gameManager);
         }, config.RESULTS_TRANSITION_DELAY);
       }
     } catch (error) {

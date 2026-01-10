@@ -31,6 +31,7 @@ function setupGameEvents(io, socket, gameManager) {
             totalQuestions: currentState.selectedQuestionIds.length
           });
 
+          console.log('[GameEvents] Emitting phaseChange to submit (startGame)');
           io.to(roomCode).emit('phaseChange', {
             phase: 'submit',
             timeRemaining: config.SUBMIT_PHASE_DURATION
@@ -67,6 +68,7 @@ function setupGameEvents(io, socket, gameManager) {
             totalQuestions: gameState.selectedQuestionIds.length
           });
 
+          console.log('[GameEvents] Emitting phaseChange to submit (nextQuestion)');
           io.to(roomCode).emit('phaseChange', {
             phase: 'submit',
             timeRemaining: config.SUBMIT_PHASE_DURATION

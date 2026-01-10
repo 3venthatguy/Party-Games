@@ -9,10 +9,15 @@
  */
 function setupHostSocketHandlers(socket, state) {
   socket.on('roomCreated', (code) => {
+    console.log('Room created with code:', code);
     state.roomCode = code;
     const roomCodeDisplay = document.getElementById('roomCodeDisplay');
-    roomCodeDisplay.textContent = code;
-    socket.join(code);
+    if (roomCodeDisplay) {
+      roomCodeDisplay.textContent = code;
+      console.log('Room code displayed:', code);
+    } else {
+      console.error('Room code display element not found!');
+    }
   });
 
   socket.on('playerJoined', (data) => {
@@ -48,13 +53,16 @@ function setupHostSocketHandlers(socket, state) {
   });
 
   socket.on('phaseChange', (data) => {
+    console.log('[SocketHandlers] phaseChange event received:', data);
     state.currentPhase = data.phase;
 
     if (data.phase === 'submit') {
       showSubmitPhase(state.players.length);
     } else if (data.phase === 'voting') {
+      console.log('[SocketHandlers] Showing voting phase...');
       showVotingPhase();
     } else if (data.phase === 'results') {
+      console.log('[SocketHandlers] Showing results phase...');
       showResultsPhase();
     }
 
@@ -75,15 +83,96 @@ function setupHostSocketHandlers(socket, state) {
   });
 
   socket.on('votingReady', (data) => {
+    console.log('[SocketHandlers] votingReady event received:', data);
     const { answers } = data;
     displayVotingAnswers(answers);
   });
 
   socket.on('resultsReady', (data) => {
+    // Legacy handler - animation sequence now handled by individual events
+    console.log('[SocketHandlers] resultsReady event received (LEGACY - should not fire during voting!):', data);
     showResultsPhase();
     hideTimer();
     displayResults(data, state.players);
-    updateLeaderboard(data.totalScores, data.roundScores);
+  });
+
+  // Results animation sequence events
+  socket.on('results:startSequence', (data) => {
+    if (typeof handleResultsStartSequence === 'function') {
+      handleResultsStartSequence(data);
+    }
+  });
+
+  socket.on('results:highlightAnswer', (data) => {
+    if (typeof handleHighlightAnswer === 'function') {
+      handleHighlightAnswer(data);
+    }
+  });
+
+  socket.on('results:showVoters', (data) => {
+    if (typeof handleShowVoters === 'function') {
+      handleShowVoters(data);
+    }
+  });
+
+  socket.on('results:revealAuthor', (data) => {
+    if (typeof handleRevealAuthor === 'function') {
+      handleRevealAuthor(data);
+    }
+  });
+
+  socket.on('results:updateScore', (data) => {
+    if (typeof handleUpdateScore === 'function') {
+      handleUpdateScore(data);
+    }
+  });
+
+  socket.on('results:transitionNext', (data) => {
+    if (typeof handleTransitionNext === 'function') {
+      handleTransitionNext(data);
+    }
+  });
+
+  socket.on('results:correctAnswerBuild', (data) => {
+    if (typeof handleCorrectAnswerBuild === 'function') {
+      handleCorrectAnswerBuild(data);
+    }
+  });
+
+  socket.on('results:correctAnswerReveal', (data) => {
+    if (typeof handleCorrectAnswerReveal === 'function') {
+      handleCorrectAnswerReveal(data);
+    }
+  });
+
+  socket.on('results:showCorrectVoters', (data) => {
+    if (typeof handleShowCorrectVoters === 'function') {
+      handleShowCorrectVoters(data);
+    }
+  });
+
+  socket.on('results:updateCorrectScores', (data) => {
+    if (typeof handleUpdateCorrectScores === 'function') {
+      handleUpdateCorrectScores(data);
+    }
+  });
+
+  socket.on('results:showExplanation', (data) => {
+    if (typeof handleShowExplanation === 'function') {
+      handleShowExplanation(data);
+    }
+  });
+
+  socket.on('results:showLeaderboard', (data) => {
+    if (typeof handleShowLeaderboard === 'function') {
+      handleShowLeaderboard(data);
+    }
+  });
+
+  socket.on('results:complete', (data) => {
+    if (typeof handleResultsComplete === 'function') {
+      handleResultsComplete(data);
+    }
   });
 
   socket.on('gameOver', (data) => {

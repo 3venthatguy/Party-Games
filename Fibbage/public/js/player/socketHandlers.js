@@ -96,9 +96,53 @@ function setupPlayerSocketHandlers(socket, state) {
   });
 
   socket.on('resultsReady', (data) => {
+    // Legacy handler - animation sequence now handled by individual events
     showPlayerResultsPhase();
     hidePlayerTimer();
     displayPlayerResults(data, state.playerId);
+  });
+
+  // Results animation sequence events (simplified for player view)
+  socket.on('results:startSequence', (data) => {
+    if (typeof handlePlayerResultsStart === 'function') {
+      handlePlayerResultsStart(data);
+    }
+  });
+
+  socket.on('results:correctAnswerReveal', (data) => {
+    if (typeof handlePlayerCorrectAnswerReveal === 'function') {
+      handlePlayerCorrectAnswerReveal(data);
+    }
+  });
+
+  socket.on('results:showExplanation', (data) => {
+    if (typeof handlePlayerShowExplanation === 'function') {
+      handlePlayerShowExplanation(data);
+    }
+  });
+
+  socket.on('results:updateScore', (data) => {
+    if (typeof handlePlayerScoreUpdate === 'function') {
+      handlePlayerScoreUpdate(data);
+    }
+  });
+
+  socket.on('results:updateCorrectScores', (data) => {
+    // Check if this player is in the correct voters
+    const ourVoter = data.voters.find(v => v.id === state.playerId);
+    if (ourVoter && typeof handlePlayerScoreUpdate === 'function') {
+      handlePlayerScoreUpdate({
+        playerId: state.playerId,
+        pointsEarned: ourVoter.pointsEarned,
+        newTotalScore: ourVoter.newTotalScore
+      });
+    }
+  });
+
+  socket.on('results:showLeaderboard', (data) => {
+    if (typeof handlePlayerLeaderboard === 'function') {
+      handlePlayerLeaderboard(data);
+    }
   });
 
   socket.on('gameOver', (data) => {
