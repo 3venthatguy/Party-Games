@@ -6,6 +6,8 @@ class Timer {
   constructor() {
     this.startTime = null;
     this.duration = 0;
+    this.pausedAt = null;
+    this.pausedTimeRemaining = 0;
   }
 
   /**
@@ -22,6 +24,11 @@ class Timer {
    * @returns {number} Remaining time in seconds
    */
   getTimeRemaining() {
+    // If paused, return the paused time
+    if (this.pausedAt !== null) {
+      return this.pausedTimeRemaining;
+    }
+
     if (!this.startTime) return 0;
     const elapsed = Date.now() - this.startTime;
     const remaining = Math.max(0, Math.ceil((this.duration - elapsed) / 1000));
@@ -37,11 +44,50 @@ class Timer {
   }
 
   /**
+   * Pauses the timer.
+   */
+  pause() {
+    if (this.pausedAt !== null) return; // Already paused
+    if (!this.startTime) return; // Not started
+
+    this.pausedAt = Date.now();
+    this.pausedTimeRemaining = this.getTimeRemaining();
+  }
+
+  /**
+   * Resumes the timer.
+   */
+  resume() {
+    if (this.pausedAt === null) return; // Not paused
+
+    // Calculate how much time was remaining when paused
+    const remainingMs = this.pausedTimeRemaining * 1000;
+
+    // Reset start time and duration to continue from where we left off
+    this.startTime = Date.now();
+    this.duration = remainingMs;
+
+    // Clear pause state
+    this.pausedAt = null;
+    this.pausedTimeRemaining = 0;
+  }
+
+  /**
+   * Checks if the timer is paused.
+   * @returns {boolean} True if paused, false otherwise
+   */
+  isPaused() {
+    return this.pausedAt !== null;
+  }
+
+  /**
    * Resets the timer.
    */
   reset() {
     this.startTime = null;
     this.duration = 0;
+    this.pausedAt = null;
+    this.pausedTimeRemaining = 0;
   }
 }
 

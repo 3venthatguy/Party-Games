@@ -9,6 +9,12 @@
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
+  <!-- Audio Controls (fixed position, top right) -->
+  <div class="audio-controls">
+    <button class="audio-toggle-button" id="musicToggleButton">🎵 Music</button>
+    <button class="audio-toggle-button" id="sfxToggleButton">🔊 SFX</button>
+  </div>
+
   <div class="container">
     <!-- Lobby Screen -->
     <div id="lobbyScreen" class="lobby-screen active">
@@ -64,6 +70,8 @@
   <!-- UI Utilities -->
   <script src="js/host/ui/uiUpdater.js"></script>
   <script src="js/host/ui/timer.js"></script>
+  <script src="js/host/ui/gameMusic.js"></script>
+  <script src="js/host/ui/soundEffects.js"></script>
 
   <!-- Screen Modules -->
   <script src="js/host/screens/lobbyScreen.js"></script>

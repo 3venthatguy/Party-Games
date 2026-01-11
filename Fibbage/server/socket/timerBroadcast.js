@@ -19,6 +19,11 @@ function startTimerBroadcast(io, roomCode, gameManager) {
       return;
     }
 
+    // Skip broadcasting if timer is paused
+    if (gameState.timer.isPaused()) {
+      return;
+    }
+
     const timeRemaining = gameManager.getTimeRemaining(gameState);
 
     if (timeRemaining > 0) {
@@ -73,8 +78,28 @@ function handleSubmitPhaseExpiry(io, roomCode, gameState, gameManager, timerInte
     // Restart the timer NOW (after the delay) so it syncs with the client
     gameState.startTimer(config.VOTING_PHASE_DURATION);
 
-    io.to(roomCode).emit('votingReady', {
+    // Send voting answers to host (shows all answers)
+    io.to(gameState.hostId).emit('votingReady', {
       answers: shuffledAnswers.map(a => ({ id: a.id, text: a.text }))
+    });
+
+    // Send filtered answers to each player (exclude their own answer)
+    gameState.players.forEach(player => {
+      const filteredAnswers = shuffledAnswers.filter(answer => {
+        // Keep the correct answer
+        if (answer.id === 'correct') return true;
+
+        // For duplicate answers, check if this player is in the playerIds array
+        if (answer.playerIds && answer.playerIds.includes(player.id)) {
+          return false; // Exclude this answer - player submitted it
+        }
+
+        return true; // Show all other answers
+      });
+
+      io.to(player.socketId).emit('votingReady', {
+        answers: filteredAnswers.map(a => ({ id: a.id, text: a.text }))
+      });
     });
 
     console.log('[TimerBroadcast] Emitting phaseChange to voting (submit phase expired)');
@@ -95,46 +120,25 @@ function handleSubmitPhaseExpiry(io, roomCode, gameState, gameManager, timerInte
 function handleVotingPhaseExpiry(io, roomCode, gameState, gameManager, timerInterval) {
   console.log('[TimerBroadcast] Voting phase expired, transitioning to results');
 
+  // Record null votes for players who didn't vote
+  gameState.players.forEach(player => {
+    if (!gameState.hasVoted(player.id)) {
+      console.log(`[TimerBroadcast] Player ${player.name} did not vote, recording null vote`);
+      gameState.submitVote(player.id, null);
+    }
+  });
+
   // Transition to results phase
   gameState.setPhase('results');
 
-  if (Object.keys(gameState.votes).length > 0) {
-    // Start results animation sequence
-    const { startResultsAnimation } = require('./events/resultsEvents');
+  // Emit transition sound event before results
+  io.to(roomCode).emit('playTransitionSound');
+
+  // Always start results animation sequence after a delay for the sound
+  const { startResultsAnimation } = require('./events/resultsEvents');
+  setTimeout(() => {
     startResultsAnimation(io, roomCode, gameManager);
-  } else {
-    console.log('[TimerBroadcast] No votes submitted, auto-advancing to next question');
-    // Auto-advance if no votes
-    setTimeout(() => {
-      try {
-        const nextState = gameManager.nextQuestion(roomCode, gameState.hostId);
-        if (nextState.phase === 'gameOver') {
-          const finalScores = nextState.players
-            .map(p => p.toClientData())
-            .sort((a, b) => b.score - a.score);
-          io.to(roomCode).emit('gameOver', { finalScores });
-        } else {
-          // Restart the timer NOW (after the delay) so it syncs with the client
-          nextState.startTimer(config.READING_PHASE_DURATION);
-
-          io.to(roomCode).emit('newQuestion', {
-            question: nextState.currentQuestion.question,
-            questionIndex: nextState.currentQuestionIndex,
-            totalQuestions: nextState.selectedQuestionIds.length
-          });
-
-          io.to(roomCode).emit('phaseChange', {
-            phase: 'reading',
-            timeRemaining: config.READING_PHASE_DURATION
-          });
-
-          startTimerBroadcast(io, roomCode, gameManager);
-        }
-      } catch (e) {
-        logError('auto-advancing', e);
-      }
-    }, config.AUTO_ADVANCE_DELAY);
-  }
+  }, config.RESULTS_TRANSITION_DELAY);
 
   clearInterval(timerInterval);
 }

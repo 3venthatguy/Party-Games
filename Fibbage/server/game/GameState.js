@@ -132,6 +132,20 @@ class GameState {
   }
 
   /**
+   * Pauses the timer.
+   */
+  pauseTimer() {
+    this.timer.pause();
+  }
+
+  /**
+   * Resumes the timer.
+   */
+  resumeTimer() {
+    this.timer.resume();
+  }
+
+  /**
    * Gets remaining time on the timer.
    * @returns {number} Remaining time in seconds
    */

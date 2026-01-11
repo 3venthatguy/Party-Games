@@ -30,19 +30,44 @@ class ResultsAnimator {
   async playResultsSequence(results) {
     const { correctAnswer, explanation, roundScores, totalScores, votes, voteCounts } = results;
 
+    // Group players by their answers to handle duplicates
+    const answerGroups = new Map(); // answer text -> {playerIds: [], playerNames: [], text: string}
+
+    this.gameState.players.forEach(player => {
+      const answer = this.gameState.submittedAnswers[player.id];
+      if (answer && answer !== correctAnswer) {
+        if (!answerGroups.has(answer)) {
+          answerGroups.set(answer, {
+            playerIds: [],
+            playerNames: [],
+            text: answer
+          });
+        }
+        answerGroups.get(answer).playerIds.push(player.id);
+        answerGroups.get(answer).playerNames.push(player.name);
+      }
+    });
+
     // Prepare fake answers with vote information
-    const allFakeAnswers = this.gameState.players
-      .filter(player => {
-        const answer = this.gameState.submittedAnswers[player.id];
-        return answer && answer !== correctAnswer;
-      })
-      .map(player => ({
-        playerId: player.id,
-        playerName: player.name,
-        answerText: this.gameState.submittedAnswers[player.id],
-        voters: this.getVotersForAnswer(player.id, votes),
-        pointsEarned: roundScores[player.id] || 0
-      }));
+    // For duplicate answers, use comma-separated player IDs as the combined ID
+    const allFakeAnswers = Array.from(answerGroups.values()).map(group => {
+      const combinedId = group.playerIds.length === 1 ? group.playerIds[0] : group.playerIds.join(',');
+      const combinedName = group.playerNames.join(' & ');
+
+      // Calculate total points for all players who submitted this answer
+      const totalPoints = group.playerIds.reduce((sum, playerId) => sum + (roundScores[playerId] || 0), 0);
+
+      return {
+        playerId: combinedId,
+        playerName: combinedName,
+        playerIds: group.playerIds, // Store individual player IDs for display
+        playerNames: group.playerNames, // Store individual names
+        answerText: group.text,
+        voters: this.getVotersForAnswer(combinedId, votes),
+        pointsEarned: totalPoints,
+        pointsPerPlayer: group.playerIds.length > 1 ? roundScores[group.playerIds[0]] || 0 : totalPoints // For showing split points
+      };
+    });
 
     // CRITICAL: Filter to only include answers that received votes (Jackbox flow)
     const votedOnFakeAnswers = allFakeAnswers.filter(answer => answer.voters.length > 0);
@@ -102,13 +127,28 @@ class ResultsAnimator {
 
   /**
    * Gets list of voters for a specific answer.
-   * @param {string} answerPlayerId - Player ID who wrote the answer
+   * Handles both single player IDs and comma-separated player IDs (for duplicate answers).
+   * @param {string} answerPlayerId - Player ID or comma-separated player IDs who wrote the answer
    * @param {object} votes - All votes
    * @returns {Array} Array of voter player IDs
    */
   getVotersForAnswer(answerPlayerId, votes) {
+    // Split the answerPlayerId in case it's a comma-separated list (duplicate answers)
+    const playerIds = answerPlayerId.includes(',') ? answerPlayerId.split(',') : [answerPlayerId];
+
     return Object.entries(votes)
-      .filter(([voterId, votedForId]) => votedForId === answerPlayerId)
+      .filter(([voterId, votedForId]) => {
+        if (!votedForId || votedForId === 'correct') return false;
+
+        // Check if votedForId matches any of the playerIds
+        // votedForId could be single ID or comma-separated IDs
+        if (votedForId.includes(',')) {
+          const votedForIds = votedForId.split(',');
+          return votedForIds.some(id => playerIds.includes(id));
+        }
+
+        return playerIds.includes(votedForId);
+      })
       .map(([voterId]) => {
         const player = this.gameState.getPlayer(voterId);
         return player ? { id: player.id, name: player.name } : null;
@@ -122,7 +162,7 @@ class ResultsAnimator {
    * @param {number} index - Index in sequence
    */
   async revealFakeAnswer(fakeAnswer, index) {
-    const { playerId, playerName, answerText, voters, pointsEarned } = fakeAnswer;
+    const { playerId, playerName, answerText, voters, pointsEarned, playerIds, playerNames, pointsPerPlayer } = fakeAnswer;
 
     // Phase 1: Highlight Answer
     this.io.to(this.roomCode).emit('results:highlightAnswer', {
@@ -141,6 +181,8 @@ class ResultsAnimator {
       sequenceId: this.sequenceId,
       answerId: playerId,
       authorName: playerName,
+      authorNames: playerNames, // For duplicate answers
+      isDuplicate: playerIds && playerIds.length > 1,
       voters: voters,
       pointsEarned: pointsEarned
     });
@@ -155,25 +197,35 @@ class ResultsAnimator {
     // Wait for voters to appear (staggered)
     await this.delay(this.timings.voterAppearStagger * voters.length + 500);
 
-    // Phase 5: Reveal Author
+    // Phase 5: Reveal Author(s)
     this.io.to(this.roomCode).emit('results:revealAuthor', {
       sequenceId: this.sequenceId,
       answerId: playerId,
       authorId: playerId,
+      authorIds: playerIds, // Array of all player IDs who submitted this answer
       authorName: playerName,
+      authorNames: playerNames, // Array of all player names
+      isDuplicate: playerIds && playerIds.length > 1,
       pointsEarned: pointsEarned,
+      pointsPerPlayer: pointsPerPlayer, // Points each player gets (for split points display)
       voterCount: voters.length
     });
     await this.delay(this.timings.authorRevealDuration);
 
-    // Phase 6: Score Update
-    if (pointsEarned > 0) {
-      this.io.to(this.roomCode).emit('results:updateScore', {
-        sequenceId: this.sequenceId,
-        playerId: playerId,
-        pointsEarned: pointsEarned,
-        newTotalScore: this.gameState.getPlayer(playerId).score
-      });
+    // Phase 6: Score Update - update each player's score individually
+    if (pointsEarned > 0 && playerIds && playerIds.length > 0) {
+      // For duplicate answers, emit score updates for each player
+      for (const pid of playerIds) {
+        const player = this.gameState.getPlayer(pid);
+        if (player) {
+          this.io.to(this.roomCode).emit('results:updateScore', {
+            sequenceId: this.sequenceId,
+            playerId: pid,
+            pointsEarned: pointsPerPlayer,
+            newTotalScore: player.score
+          });
+        }
+      }
       await this.delay(this.timings.scoreAnimationDuration);
     }
 

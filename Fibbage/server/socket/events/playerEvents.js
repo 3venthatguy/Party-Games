@@ -38,8 +38,28 @@ function setupPlayerEvents(io, socket, gameManager) {
           // Restart the timer NOW (after the delay) so it syncs with the client
           gameState.startTimer(config.VOTING_PHASE_DURATION);
 
-          io.to(roomCode).emit('votingReady', {
+          // Send voting answers to host (shows all answers)
+          io.to(gameState.hostId).emit('votingReady', {
             answers: shuffledAnswers.map(a => ({ id: a.id, text: a.text }))
+          });
+
+          // Send filtered answers to each player (exclude their own answer)
+          gameState.players.forEach(player => {
+            const filteredAnswers = shuffledAnswers.filter(answer => {
+              // Keep the correct answer
+              if (answer.id === 'correct') return true;
+
+              // For duplicate answers, check if this player is in the playerIds array
+              if (answer.playerIds && answer.playerIds.includes(player.id)) {
+                return false; // Exclude this answer - player submitted it
+              }
+
+              return true; // Show all other answers
+            });
+
+            io.to(player.socketId).emit('votingReady', {
+              answers: filteredAnswers.map(a => ({ id: a.id, text: a.text }))
+            });
           });
 
           console.log('[PlayerEvents] Emitting phaseChange to voting (all answers submitted)');
@@ -74,10 +94,17 @@ function setupPlayerEvents(io, socket, gameManager) {
         votedForId: votedForId
       });
 
-      // If all voted, calculate and start results animation
+      // If all voted, pause timer and start results animation
       if (gameState.phase === 'results') {
-        console.log('[PlayerEvents] All votes submitted, transitioning to results phase');
+        console.log('[PlayerEvents] All votes submitted, pausing timer and transitioning to results phase');
+
+        // Pause the timer since all votes are in
+        gameState.pauseTimer();
+
         const { startResultsAnimation } = require('./resultsEvents');
+
+        // Emit transition sound event before results
+        io.to(roomCode).emit('playTransitionSound');
 
         setTimeout(() => {
           console.log('[PlayerEvents] Starting results animation after delay');

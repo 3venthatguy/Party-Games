@@ -64,15 +64,25 @@ function setupHostSocketHandlers(socket, state) {
 
     if (data.phase === 'reading') {
       showReadingPhase(data.timeRemaining);
+      // Stop game music during reading phase
+      stopGameMusic();
     } else if (data.phase === 'submit') {
       showSubmitPhase(state.players.length);
+      // Start game music for submit phase
+      playRandomGameMusic();
     } else if (data.phase === 'voting') {
       console.log('[SocketHandlers] Showing voting phase...');
       showVotingPhase();
+      // Continue game music into voting phase (or start if not playing)
+      if (!isGameMusicPlaying()) {
+        playRandomGameMusic();
+      }
     } else if (data.phase === 'results') {
       console.log('[SocketHandlers] Showing results phase...');
       showResultsPhase();
       hideTimer(); // Hide timer during results animation
+      // Stop music during results
+      stopGameMusic();
     }
 
     updateTimer(data.timeRemaining);
@@ -202,9 +212,19 @@ function setupHostSocketHandlers(socket, state) {
     }
   });
 
+  socket.on('playTransitionSound', () => {
+    console.log('[SocketHandlers] Playing transition sound before results');
+    // Stop music first
+    stopGameMusic();
+    // Play the transition sound effect
+    playSoundEffect('timeToVote', 0.6);
+  });
+
   socket.on('gameOver', (data) => {
     const { finalScores } = data;
     showGameOverScreen(finalScores);
+    // Stop game music when game ends
+    stopGameMusic();
   });
 
   socket.on('error', (message) => {

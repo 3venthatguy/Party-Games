@@ -133,7 +133,10 @@ class GameRoom {
       throw new Error("You can't fool someone with the truth!");
     }
 
-    this.gameState.submitAnswer(playerId, answer);
+    // Capitalize the answer
+    const capitalizedAnswer = answer.toUpperCase();
+
+    this.gameState.submitAnswer(playerId, capitalizedAnswer);
     logAnswerSubmitted(player.name, this.gameState.roomCode);
 
     // Check if all players have submitted
@@ -168,8 +171,19 @@ class GameRoom {
       throw new Error('Time expired');
     }
 
-    if (playerId === votedForId && votedForId !== 'correct') {
-      throw new Error('Cannot vote for your own answer');
+    // Check if player is voting for their own answer
+    // For duplicate answers, votedForId might be comma-separated IDs
+    if (votedForId !== 'correct') {
+      if (votedForId.includes(',')) {
+        // For duplicate answers, check if player's ID is in the comma-separated list
+        const playerIds = votedForId.split(',');
+        if (playerIds.includes(playerId)) {
+          throw new Error('Cannot vote for your own answer');
+        }
+      } else if (playerId === votedForId) {
+        // Single answer case
+        throw new Error('Cannot vote for your own answer');
+      }
     }
 
     const player = this.gameState.getPlayer(playerId);
@@ -178,10 +192,21 @@ class GameRoom {
     }
 
     // Validate voted for player exists (if not 'correct')
+    // For duplicate answers, votedForId might be comma-separated IDs
     if (votedForId !== 'correct') {
-      const votedFor = this.gameState.getPlayer(votedForId);
-      if (!votedFor) {
-        throw new Error('Player not found');
+      // Check if it's a comma-separated list (duplicate answer)
+      if (votedForId.includes(',')) {
+        const playerIds = votedForId.split(',');
+        const allExist = playerIds.every(id => this.gameState.getPlayer(id) !== undefined);
+        if (!allExist) {
+          throw new Error('Player not found');
+        }
+      } else {
+        // Single player ID
+        const votedFor = this.gameState.getPlayer(votedForId);
+        if (!votedFor) {
+          throw new Error('Player not found');
+        }
       }
     }
 
@@ -194,7 +219,9 @@ class GameRoom {
     if (votedForId === 'correct') {
       logVoteForCorrect(player.name, this.gameState.roomCode);
     } else {
-      const votedFor = this.gameState.getPlayer(votedForId);
+      // For duplicate answers, log the first player's name
+      const firstPlayerId = votedForId.includes(',') ? votedForId.split(',')[0] : votedForId;
+      const votedFor = this.gameState.getPlayer(firstPlayerId);
       logVoteSubmitted(player.name, votedFor ? votedFor.name : 'unknown', this.gameState.roomCode);
     }
 

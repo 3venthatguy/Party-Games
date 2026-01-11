@@ -27,6 +27,13 @@ function initializeHost() {
   // Setup button handlers
   setupButtonHandlers();
 
+  // Initialize audio button states
+  updateMusicButton();
+  updateSfxButton();
+
+  // Try to start music (will likely fail due to autoplay policy, user can click button)
+  playRandomIntroMusic();
+
   // Create room
   createRoom();
 }
@@ -46,9 +53,15 @@ function setupButtonHandlers() {
   const startButton = document.getElementById('startButton');
   const nextButton = document.getElementById('nextButton');
   const playAgainButton = document.getElementById('playAgainButton');
+  const musicToggleButton = document.getElementById('musicToggleButton');
+  const sfxToggleButton = document.getElementById('sfxToggleButton');
 
   if (startButton) {
     startButton.addEventListener('click', () => {
+      // User interaction - try to start music if it failed on page load
+      if (isMusicEnabled() && !isGameMusicPlaying()) {
+        playRandomIntroMusic();
+      }
       socket.emit('startGame', { roomCode: hostState.roomCode });
       startButton.disabled = true;
     });
@@ -63,6 +76,18 @@ function setupButtonHandlers() {
   if (playAgainButton) {
     playAgainButton.addEventListener('click', () => {
       location.reload();
+    });
+  }
+
+  if (musicToggleButton) {
+    musicToggleButton.addEventListener('click', () => {
+      toggleMusic();
+    });
+  }
+
+  if (sfxToggleButton) {
+    sfxToggleButton.addEventListener('click', () => {
+      toggleSoundEffects();
     });
   }
 }

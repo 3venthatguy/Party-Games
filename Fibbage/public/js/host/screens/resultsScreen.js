@@ -265,7 +265,23 @@ async function handleRevealAuthor(data) {
   currentAnswerElement.appendChild(authorContainer);
 
   const { revealAuthor } = await import('../animations/resultsAnimations.js');
-  await revealAuthor(authorContainer, data.authorName, data.pointsEarned);
+
+  // Check if this is a duplicate answer (multiple authors)
+  if (data.isDuplicate && data.authorNames && data.authorNames.length > 1) {
+    // For duplicate answers, pass additional information including authorIds
+    await revealAuthor(authorContainer, data.authorName, data.pointsEarned, {
+      isDuplicate: true,
+      authorNames: data.authorNames,
+      authorIds: data.authorIds,
+      pointsPerPlayer: data.pointsPerPlayer
+    });
+  } else {
+    // Single author - pass authorId for score update
+    await revealAuthor(authorContainer, data.authorName, data.pointsEarned, {
+      isDuplicate: false,
+      authorId: data.authorId
+    });
+  }
 }
 
 /**
@@ -275,15 +291,16 @@ async function handleRevealAuthor(data) {
 async function handleUpdateScore(data) {
   if (data.sequenceId !== currentSequenceId || !currentAnswerElement) return;
 
-  const scoreContainer = document.createElement('div');
-  scoreContainer.className = 'score-container';
-  currentAnswerElement.appendChild(scoreContainer);
+  // Find the table cell for this player's total score
+  const totalCell = currentAnswerElement.querySelector(`[data-player-id="${data.playerId}"]`);
 
-  const player = animationState.totalScores?.find(p => p.id === data.playerId);
-  const startScore = player ? (player.score - data.pointsEarned) : 0;
-
-  const { animateScore } = await import('../animations/resultsAnimations.js');
-  await animateScore(scoreContainer, data.pointsEarned, startScore, data.newTotalScore);
+  if (totalCell) {
+    // Update the table cell with animated counting
+    const { countUpScore } = await import('../animations/resultsAnimations.js');
+    const player = animationState.totalScores?.find(p => p.id === data.playerId);
+    const startScore = player ? (player.score - data.pointsEarned) : 0;
+    await countUpScore(totalCell, startScore, data.newTotalScore, 1000);
+  }
 }
 
 /**
@@ -374,28 +391,69 @@ function handleShowCorrectVoters(data) {
   if (data.sequenceId !== currentSequenceId || !currentAnswerElement) return;
 
   const votersContainer = document.createElement('div');
-  votersContainer.className = 'correct-voters-container';
+  votersContainer.className = 'author-container';
 
   if (data.voters.length === 0) {
-    votersContainer.innerHTML = '<div class="no-correct-voters">Everyone was fooled!</div>';
+    const noVotersDiv = document.createElement('div');
+    noVotersDiv.className = 'author-reveal';
+    noVotersDiv.innerHTML = '<div class="no-correct-voters" style="text-align: center; padding: 20px;">Everyone was fooled!</div>';
+    votersContainer.appendChild(noVotersDiv);
   } else {
-    const label = document.createElement('div');
-    label.className = 'correct-voters-label';
-    label.textContent = 'THESE PLAYERS KNEW THE TRUTH!';
-    votersContainer.appendChild(label);
+    // Create table structure for correct voters
+    const authorReveal = document.createElement('div');
+    authorReveal.className = 'author-reveal';
 
-    const votersList = document.createElement('div');
-    votersList.className = 'correct-voters-list';
+    const table = document.createElement('div');
+    table.className = 'author-table';
+
+    // Table header
+    const header = document.createElement('div');
+    header.className = 'author-table-header';
+
+    const headerName = document.createElement('div');
+    headerName.className = 'author-table-header-cell';
+    headerName.textContent = 'Knew The Truth';
+
+    const headerWon = document.createElement('div');
+    headerWon.className = 'author-table-header-cell';
+    headerWon.textContent = 'Won';
+
+    const headerPoints = document.createElement('div');
+    headerPoints.className = 'author-table-header-cell';
+    headerPoints.textContent = 'Points';
+
+    header.appendChild(headerName);
+    header.appendChild(headerWon);
+    header.appendChild(headerPoints);
+    table.appendChild(header);
+
+    // Create rows for each correct voter
     data.voters.forEach((voter, index) => {
-      setTimeout(() => {
-        const voterElement = document.createElement('div');
-        voterElement.className = 'correct-voter';
-        voterElement.dataset.playerId = voter.id;
-        voterElement.textContent = voter.name;
-        votersList.appendChild(voterElement);
-      }, index * 200);
+      const row = document.createElement('div');
+      row.className = 'author-table-row';
+      row.style.animationDelay = `${index * 0.1}s`;
+
+      const nameCell = document.createElement('div');
+      nameCell.className = 'author-table-name';
+      nameCell.textContent = voter.name;
+
+      const pointsCell = document.createElement('div');
+      pointsCell.className = 'author-table-points';
+      pointsCell.textContent = '—'; // Will be updated when scores come in
+
+      const totalCell = document.createElement('div');
+      totalCell.className = 'author-table-total';
+      totalCell.dataset.playerId = voter.id;
+      totalCell.textContent = '—';
+
+      row.appendChild(nameCell);
+      row.appendChild(pointsCell);
+      row.appendChild(totalCell);
+      table.appendChild(row);
     });
-    votersContainer.appendChild(votersList);
+
+    authorReveal.appendChild(table);
+    votersContainer.appendChild(authorReveal);
   }
 
   currentAnswerElement.appendChild(votersContainer);

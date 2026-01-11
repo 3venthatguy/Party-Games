@@ -1,5 +1,6 @@
 /**
  * Lobby screen logic for the host.
+ * Music is now handled by the unified gameMusic.js manager.
  */
 
 /**
@@ -13,6 +14,9 @@ function showLobbyScreen() {
   lobbyScreen.classList.add('active');
   gameScreen.classList.remove('active');
   gameOverScreen.classList.remove('active');
+
+  // Play random intro music when lobby is shown (handled by gameMusic.js)
+  playRandomIntroMusic();
 }
 
 /**
@@ -21,4 +25,6 @@ function showLobbyScreen() {
 function hideLobbyScreen() {
   const lobbyScreen = document.getElementById('lobbyScreen');
   lobbyScreen.classList.remove('active');
+
+  // Music transition handled by phase change logic
 }

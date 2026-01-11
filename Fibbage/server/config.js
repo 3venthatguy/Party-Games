@@ -27,7 +27,7 @@ module.exports = {
   // Transition delays (in milliseconds)
   GAME_START_DELAY: 1000,
   VOTING_TRANSITION_DELAY: 2000,
-  RESULTS_TRANSITION_DELAY: 1000,
+  RESULTS_TRANSITION_DELAY: 3000, // Increased to allow time_to_vote.mp3 to play + 2s delay
   AUTO_ADVANCE_DELAY: 3000,
 
   // Scoring
@@ -39,7 +39,7 @@ module.exports = {
 
   // Results animation timings (in milliseconds)
   RESULTS_ANIMATION_TIMINGS: {
-    answerHighlight: 500,
+    answerHighlight: 1000,
     suspensePause: 1500,
     lieRevealDuration: 1500,
     voterAppearStagger: 1500,

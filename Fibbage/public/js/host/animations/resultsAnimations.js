@@ -80,11 +80,17 @@ export function showVoters(container, voters) {
 /**
  * Reveals the author with burst effect.
  * @param {HTMLElement} container - Container element
- * @param {string} authorName - Author's name
- * @param {number} pointsEarned - Points earned
+ * @param {string} authorName - Author's name (combined name for duplicates)
+ * @param {number} pointsEarned - Total points earned
+ * @param {object} options - Optional parameters for duplicate answers
+ * @param {boolean} options.isDuplicate - Whether multiple players wrote this answer
+ * @param {Array} options.authorNames - Array of individual author names (for duplicates)
+ * @param {Array} options.authorIds - Array of individual player IDs (for duplicates)
+ * @param {number} options.pointsPerPlayer - Points each player gets (for duplicates)
+ * @param {Array} options.playerScores - Array of player scores (for looking up totals)
  * @returns {Promise} Promise that resolves when animation completes
  */
-export function revealAuthor(container, authorName, pointsEarned) {
+export function revealAuthor(container, authorName, pointsEarned, options = {}) {
   return new Promise((resolve) => {
     if (!container) {
       resolve();
@@ -92,20 +98,89 @@ export function revealAuthor(container, authorName, pointsEarned) {
     }
 
     container.innerHTML = '';
-    
+
     const authorReveal = document.createElement('div');
     authorReveal.className = 'author-reveal';
-    
-    const label = document.createElement('div');
-    label.className = 'author-label';
-    label.textContent = 'FOOLED BY';
-    
-    const name = document.createElement('div');
-    name.className = 'author-name';
-    name.textContent = authorName;
-    
-    authorReveal.appendChild(label);
-    authorReveal.appendChild(name);
+
+    // Create table structure
+    const table = document.createElement('div');
+    table.className = 'author-table';
+
+    // Table header
+    const header = document.createElement('div');
+    header.className = 'author-table-header';
+
+    const headerFooledBy = document.createElement('div');
+    headerFooledBy.className = 'author-table-header-cell';
+    headerFooledBy.textContent = 'Fooled By';
+
+    const headerWon = document.createElement('div');
+    headerWon.className = 'author-table-header-cell';
+    headerWon.textContent = 'Won';
+
+    const headerPoints = document.createElement('div');
+    headerPoints.className = 'author-table-header-cell';
+    headerPoints.textContent = 'Points';
+
+    header.appendChild(headerFooledBy);
+    header.appendChild(headerWon);
+    header.appendChild(headerPoints);
+    table.appendChild(header);
+
+    // Handle duplicate answers - create a row for each author
+    if (options.isDuplicate && options.authorNames && options.authorNames.length > 1 && options.authorIds) {
+      options.authorNames.forEach((individualName, index) => {
+        const row = document.createElement('div');
+        row.className = 'author-table-row';
+        row.style.animationDelay = `${index * 0.1}s`;
+
+        const nameCell = document.createElement('div');
+        nameCell.className = 'author-table-name';
+        nameCell.textContent = individualName;
+
+        const pointsCell = document.createElement('div');
+        pointsCell.className = 'author-table-points';
+        pointsCell.textContent = `+${options.pointsPerPlayer}`;
+
+        const totalCell = document.createElement('div');
+        totalCell.className = 'author-table-total';
+        // Store player ID for score update later
+        totalCell.dataset.playerId = options.authorIds[index];
+        totalCell.textContent = '—';
+
+        row.appendChild(nameCell);
+        row.appendChild(pointsCell);
+        row.appendChild(totalCell);
+        table.appendChild(row);
+      });
+    } else {
+      // Single author - create one row
+      const row = document.createElement('div');
+      row.className = 'author-table-row';
+
+      const nameCell = document.createElement('div');
+      nameCell.className = 'author-table-name';
+      nameCell.textContent = authorName;
+
+      const pointsCell = document.createElement('div');
+      pointsCell.className = 'author-table-points';
+      pointsCell.textContent = `+${pointsEarned}`;
+
+      const totalCell = document.createElement('div');
+      totalCell.className = 'author-table-total';
+      // Store player ID for score update later (for single author)
+      if (options.authorId) {
+        totalCell.dataset.playerId = options.authorId;
+      }
+      totalCell.textContent = '—';
+
+      row.appendChild(nameCell);
+      row.appendChild(pointsCell);
+      row.appendChild(totalCell);
+      table.appendChild(row);
+    }
+
+    authorReveal.appendChild(table);
     container.appendChild(authorReveal);
 
     // Add confetti
