@@ -1,5 +1,5 @@
 /**
- * Configuration constants for the Economics Fibbage game.
+ * Configuration constants for the Fibbage game.
  * Contains all magic numbers, timeouts, and game settings.
  */
 

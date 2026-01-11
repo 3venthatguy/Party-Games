@@ -12,7 +12,9 @@ let musicPlaying = false;
 const introMusicFiles = [
   'sounds/intro/CASIOPEA.mp3',
   'sounds/intro/LeFestin.mp3',
-  'sounds/intro/Monogatari.mp3'
+  'sounds/intro/Monogatari.mp3',
+  'sounds/intro/a_birds_last_look.mp3',
+  'sounds/intro/abandoned_plaza.mp3'
 ];
 
 // Available playing phase music files (gameplay)
@@ -22,7 +24,9 @@ const playingMusicFiles = [
   'sounds/playing/Kerfuffle.mp3',
   'sounds/playing/Piano_Black.mp3',
   'sounds/playing/Windmill_Isle.mp3',
-  'sounds/playing/bongos.mp3'
+  'sounds/playing/bongos.mp3',
+  'sounds/playing/botanic_panic.mp3',
+  'sounds/playing/incredits.mp3'
 ];
 
 /**

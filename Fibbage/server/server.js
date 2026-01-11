@@ -1,5 +1,5 @@
 /**
- * Economics Fibbage Game Server
+ * Fibbage Game Server
  * Main entry point for the server application.
  */
 
@@ -67,7 +67,7 @@ function getLocalIP() {
 // Start server
 server.listen(config.PORT, '0.0.0.0', () => {
   const localIP = getLocalIP();
-  console.log(`Economics Fibbage server running on port ${config.PORT}`);
+  console.log(`Fibbage server running on port ${config.PORT}`);
   console.log(`\n📱 Access from this computer:`);
   console.log(`   Host screen:   http://localhost:${config.PORT}/host.html`);
   console.log(`   Player screen: http://localhost:${config.PORT}/player.html`);
