@@ -10,7 +10,7 @@ module.exports = {
 
   // Room configuration
   ROOM_CODE_LENGTH: 4,
-  ROOM_CODE_CHARS: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+  ROOM_CODE_CHARS: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
   CLEANUP_INTERVAL: 5 * 60 * 1000, // 5 minutes
 
   // Game configuration
@@ -20,7 +20,7 @@ module.exports = {
   MAX_ANSWER_LENGTH: 100,
 
   // Phase durations (in seconds)
-  READING_PHASE_DURATION: 10,
+  READING_PHASE_DURATION: 8,
   SUBMIT_PHASE_DURATION: 30,
   VOTING_PHASE_DURATION: 20,
 
@@ -40,9 +40,9 @@ module.exports = {
   // Results animation timings (in milliseconds)
   RESULTS_ANIMATION_TIMINGS: {
     answerHighlight: 500,
-    suspensePause: 1000,
+    suspensePause: 1500,
     lieRevealDuration: 1500,
-    voterAppearStagger: 1000,
+    voterAppearStagger: 1500,
     authorRevealDuration: 1500,
     scoreAnimationDuration: 1500,
     reactionPause: 2000,

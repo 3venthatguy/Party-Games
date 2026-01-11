@@ -70,6 +70,9 @@ function handleSubmitPhaseExpiry(io, roomCode, gameState, gameManager, timerInte
   io.to(roomCode).emit('allAnswersSubmitted');
 
   setTimeout(() => {
+    // Restart the timer NOW (after the delay) so it syncs with the client
+    gameState.startTimer(config.VOTING_PHASE_DURATION);
+
     io.to(roomCode).emit('votingReady', {
       answers: shuffledAnswers.map(a => ({ id: a.id, text: a.text }))
     });
@@ -111,6 +114,9 @@ function handleVotingPhaseExpiry(io, roomCode, gameState, gameManager, timerInte
             .sort((a, b) => b.score - a.score);
           io.to(roomCode).emit('gameOver', { finalScores });
         } else {
+          // Restart the timer NOW (after the delay) so it syncs with the client
+          nextState.startTimer(config.READING_PHASE_DURATION);
+
           io.to(roomCode).emit('newQuestion', {
             question: nextState.currentQuestion.question,
             questionIndex: nextState.currentQuestionIndex,

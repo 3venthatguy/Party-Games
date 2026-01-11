@@ -35,6 +35,9 @@ function setupPlayerEvents(io, socket, gameManager) {
         io.to(roomCode).emit('allAnswersSubmitted');
 
         setTimeout(() => {
+          // Restart the timer NOW (after the delay) so it syncs with the client
+          gameState.startTimer(config.VOTING_PHASE_DURATION);
+
           io.to(roomCode).emit('votingReady', {
             answers: shuffledAnswers.map(a => ({ id: a.id, text: a.text }))
           });

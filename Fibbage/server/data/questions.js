@@ -122,8 +122,8 @@ const questions = [
   },
   {
     id: 21,
-    question: "In 1636, a Dutch sailor mistook a valuable tulip bulb for an _____ and ate it.",
-    answer: "onion",
+    question: "In 1636, a Dutch sailor mistook a valuable tulip bulb for _____ and ate it.",
+    answer: "an onion",
     explanation: "Tulip bulbs were so valuable during the Tulip Mania the sailor's expensive snack cost his employer the price of an entire ship. He was thrown in jail and was reported to have bad breath."
   },
   {

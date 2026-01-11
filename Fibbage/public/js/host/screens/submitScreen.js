@@ -17,13 +17,17 @@ function showReadingPhase(duration) {
   votingPhase.style.display = 'none';
   resultsPhase.style.display = 'none';
 
+  // Hide the number timer during reading phase
+  hideTimer();
+
   // Start progress bar animation
   const progressBar = document.getElementById('readingProgressBar');
   progressBar.classList.remove('animating');
+  // Set animation duration before starting
+  progressBar.style.animationDuration = duration + 's';
   // Force reflow to restart animation
   void progressBar.offsetWidth;
   progressBar.classList.add('animating');
-  progressBar.style.animationDuration = duration + 's';
 }
 
 /**
@@ -40,6 +44,9 @@ function showSubmitPhase(playerCount) {
   submitPhase.style.display = 'block';
   votingPhase.style.display = 'none';
   resultsPhase.style.display = 'none';
+
+  // Show the timer again for submit phase
+  showTimer();
 
   // Initialize checkmarks
   const submitCheckmarks = document.getElementById('submitCheckmarks');

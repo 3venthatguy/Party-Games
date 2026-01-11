@@ -25,6 +25,9 @@ function setupGameEvents(io, socket, gameManager) {
       setTimeout(() => {
         const currentState = gameManager.getGameState(roomCode);
         if (currentState && currentState.currentQuestion) {
+          // Restart the timer NOW (after the delay) so it syncs with the client
+          currentState.startTimer(config.READING_PHASE_DURATION);
+
           io.to(roomCode).emit('newQuestion', {
             question: currentState.currentQuestion.question,
             questionIndex: currentState.currentQuestionIndex,
@@ -62,6 +65,9 @@ function setupGameEvents(io, socket, gameManager) {
       } else {
         // Next question
         setTimeout(() => {
+          // Restart the timer NOW (after the delay) so it syncs with the client
+          gameState.startTimer(config.READING_PHASE_DURATION);
+
           io.to(roomCode).emit('newQuestion', {
             question: gameState.currentQuestion.question,
             questionIndex: gameState.currentQuestionIndex,
