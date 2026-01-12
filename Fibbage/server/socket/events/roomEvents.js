@@ -3,6 +3,7 @@
  */
 
 const { logError } = require('../../utils/logger');
+const config = require('../../config');
 
 /**
  * Sets up room-related event handlers.
@@ -17,7 +18,11 @@ function setupRoomEvents(io, socket, gameManager) {
       console.log('createRoom event received from socket:', socket.id);
       const roomCode = gameManager.createRoom(socket.id);
       console.log('Room created with code:', roomCode);
-      socket.emit('roomCreated', roomCode);
+      socket.emit('roomCreated', {
+        roomCode,
+        gameTitle: config.GAME_TITLE,
+        gameRules: config.GAME_RULES
+      });
       console.log('roomCreated event emitted with code:', roomCode);
       socket.join(roomCode);
     } catch (error) {
@@ -49,7 +54,9 @@ function setupRoomEvents(io, socket, gameManager) {
         phase: gameState.phase,
         currentQuestionIndex: gameState.currentQuestionIndex,
         totalQuestions: gameState.selectedQuestionIds.length || 8,
-        playerId: player.id  // Include the player's own ID
+        playerId: player.id,  // Include the player's own ID
+        gameTitle: config.GAME_TITLE,
+        gameRules: config.GAME_RULES
       });
     } catch (error) {
       socket.emit('error', error.message);

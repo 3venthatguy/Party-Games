@@ -235,7 +235,8 @@ body {
   margin: 30px 0;
 }
 
-.submit-checkmarks {
+.submit-checkmarks,
+.voting-checkmarks {
   display: flex;
   justify-content: center;
   gap: 20px;
@@ -658,7 +659,7 @@ body {
 
 .author-table-header {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr;
   gap: 15px;
   padding: 10px 15px;
   border-bottom: 2px solid rgba(255, 255, 255, 0.3);
@@ -672,14 +673,13 @@ body {
   text-align: left;
 }
 
-.author-table-header-cell:nth-child(2),
-.author-table-header-cell:nth-child(3) {
+.author-table-header-cell:nth-child(2) {
   text-align: center;
 }
 
 .author-table-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr;
   gap: 15px;
   padding: 12px 15px;
   background: rgba(255, 255, 255, 0.08);
@@ -709,18 +709,24 @@ body {
 }
 
 @keyframes pointsPop {
-  0% { transform: scale(0.5); opacity: 0; }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-.author-table-total {
-  font-size: 22px;
-  font-weight: bold;
-  color: white;
-  opacity: 0.9;
-  text-align: center;
-}
+/* Removed .author-table-total - no longer displaying total scores */
 
 /* Legacy styles for backwards compatibility */
 .author-label {

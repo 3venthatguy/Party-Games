@@ -8,9 +8,15 @@
  * @param {object} state - Host state object
  */
 function setupHostSocketHandlers(socket, state) {
-  socket.on('roomCreated', (code) => {
+  socket.on('roomCreated', (data) => {
+    // Handle both old format (string) and new format (object)
+    const code = typeof data === 'string' ? data : data.roomCode;
+    const gameTitle = data.gameTitle || 'Fibbage';
+    const gameRules = data.gameRules || '';
+
     console.log('Room created with code:', code);
     state.roomCode = code;
+
     const roomCodeDisplay = document.getElementById('roomCodeDisplay');
     if (roomCodeDisplay) {
       roomCodeDisplay.textContent = code;
@@ -18,12 +24,27 @@ function setupHostSocketHandlers(socket, state) {
     } else {
       console.error('Room code display element not found!');
     }
+
+    // Update game title
+    const gameTitleElement = document.getElementById('gameTitle');
+    if (gameTitleElement) {
+      gameTitleElement.textContent = gameTitle;
+      document.title = `${gameTitle} - Host`;
+    }
+
+    // Update game rules
+    const gameRulesElement = document.getElementById('gameRules');
+    if (gameRulesElement && gameRules) {
+      gameRulesElement.textContent = gameRules;
+    }
   });
 
   socket.on('playerJoined', (data) => {
     state.players = data.players;
     updatePlayersDisplay(state.players);
     updateStartButton(state.players.length);
+    // Play pop sound when a player joins
+    playSoundEffect('pop', 0.7);
   });
 
   socket.on('gameStarted', () => {
@@ -72,7 +93,7 @@ function setupHostSocketHandlers(socket, state) {
       playRandomGameMusic();
     } else if (data.phase === 'voting') {
       console.log('[SocketHandlers] Showing voting phase...');
-      showVotingPhase();
+      showVotingPhase(state.players.length);
       // Continue game music into voting phase (or start if not playing)
       if (!isGameMusicPlaying()) {
         playRandomGameMusic();
@@ -95,10 +116,24 @@ function setupHostSocketHandlers(socket, state) {
   socket.on('answerSubmitted', (data) => {
     const { submittedCount, totalPlayers } = data;
     updateSubmitStatus(submittedCount, totalPlayers);
+    // Play pop sound when an answer is submitted
+    playSoundEffect('pop', 0.4);
   });
 
   socket.on('allAnswersSubmitted', () => {
     showAllAnswersSubmitted();
+  });
+
+  socket.on('voteSubmitted', (data) => {
+    const { voteCount, totalPlayers } = data;
+    updateVotingStatus(voteCount, totalPlayers);
+    // Play pop sound when a vote is cast
+    playSoundEffect('pop', 0.4);
+
+    // Show "All votes submitted!" when everyone has voted
+    if (voteCount === totalPlayers) {
+      showAllVotesSubmitted();
+    }
   });
 
   socket.on('votingReady', (data) => {

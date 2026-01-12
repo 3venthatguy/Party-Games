@@ -273,13 +273,15 @@ async function handleRevealAuthor(data) {
       isDuplicate: true,
       authorNames: data.authorNames,
       authorIds: data.authorIds,
-      pointsPerPlayer: data.pointsPerPlayer
+      pointsPerPlayer: data.pointsPerPlayer,
+      voterCount: data.voterCount
     });
   } else {
     // Single author - pass authorId for score update
     await revealAuthor(authorContainer, data.authorName, data.pointsEarned, {
       isDuplicate: false,
-      authorId: data.authorId
+      authorId: data.authorId,
+      voterCount: data.voterCount
     });
   }
 }
@@ -287,20 +289,11 @@ async function handleRevealAuthor(data) {
 /**
  * Handles score update.
  * @param {object} data - Score data
+ * Note: This function is kept for compatibility but no longer updates UI since we removed total scores.
  */
 async function handleUpdateScore(data) {
   if (data.sequenceId !== currentSequenceId || !currentAnswerElement) return;
-
-  // Find the table cell for this player's total score
-  const totalCell = currentAnswerElement.querySelector(`[data-player-id="${data.playerId}"]`);
-
-  if (totalCell) {
-    // Update the table cell with animated counting
-    const { countUpScore } = await import('../animations/resultsAnimations.js');
-    const player = animationState.totalScores?.find(p => p.id === data.playerId);
-    const startScore = player ? (player.score - data.pointsEarned) : 0;
-    await countUpScore(totalCell, startScore, data.newTotalScore, 1000);
-  }
+  // No longer updating UI - scores are shown only in the "Won" column which is set during author reveal
 }
 
 /**
@@ -396,7 +389,7 @@ function handleShowCorrectVoters(data) {
   if (data.voters.length === 0) {
     const noVotersDiv = document.createElement('div');
     noVotersDiv.className = 'author-reveal';
-    noVotersDiv.innerHTML = '<div class="no-correct-voters" style="text-align: center; padding: 20px;">Everyone was fooled!</div>';
+    noVotersDiv.innerHTML = '<div class="no-correct-voters" style="text-align: center; padding: 20px; color: white;">Everyone was fooled!</div>';
     votersContainer.appendChild(noVotersDiv);
   } else {
     // Create table structure for correct voters
@@ -418,13 +411,8 @@ function handleShowCorrectVoters(data) {
     headerWon.className = 'author-table-header-cell';
     headerWon.textContent = 'Won';
 
-    const headerPoints = document.createElement('div');
-    headerPoints.className = 'author-table-header-cell';
-    headerPoints.textContent = 'Points';
-
     header.appendChild(headerName);
     header.appendChild(headerWon);
-    header.appendChild(headerPoints);
     table.appendChild(header);
 
     // Create rows for each correct voter
@@ -439,16 +427,11 @@ function handleShowCorrectVoters(data) {
 
       const pointsCell = document.createElement('div');
       pointsCell.className = 'author-table-points';
+      pointsCell.dataset.playerId = voter.id;
       pointsCell.textContent = '—'; // Will be updated when scores come in
-
-      const totalCell = document.createElement('div');
-      totalCell.className = 'author-table-total';
-      totalCell.dataset.playerId = voter.id;
-      totalCell.textContent = '—';
 
       row.appendChild(nameCell);
       row.appendChild(pointsCell);
-      row.appendChild(totalCell);
       table.appendChild(row);
     });
 
@@ -466,19 +449,17 @@ function handleShowCorrectVoters(data) {
 async function handleUpdateCorrectScores(data) {
   if (data.sequenceId !== currentSequenceId) return;
 
-  const { animateScore } = await import('../animations/resultsAnimations.js');
-  
   for (const voter of data.voters) {
     if (voter.pointsEarned > 0) {
-      const voterElement = document.querySelector(`[data-player-id="${voter.id}"]`);
-      if (voterElement) {
-        const scoreContainer = document.createElement('div');
-        scoreContainer.className = 'score-container';
-        voterElement.appendChild(scoreContainer);
-        
-        const player = animationState.totalScores?.find(p => p.id === voter.id);
-        const startScore = player ? (player.score - voter.pointsEarned) : 0;
-        await animateScore(scoreContainer, voter.pointsEarned, startScore, voter.newTotalScore);
+      const pointsCell = document.querySelector(`[data-player-id="${voter.id}"]`);
+      if (pointsCell) {
+        // Always show fixed value of +1000 for correct voters
+        pointsCell.textContent = '+1000';
+        // Apply pop animation
+        pointsCell.style.animation = 'none';
+        setTimeout(() => {
+          pointsCell.style.animation = 'pointsPop 0.5s ease-out';
+        }, 10);
       }
     }
   }

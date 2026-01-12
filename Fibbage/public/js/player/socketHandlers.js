@@ -27,6 +27,15 @@ function setupPlayerSocketHandlers(socket, state) {
   });
 
   socket.on('gameState', (data) => {
+    // Update game title if provided
+    if (data.gameTitle) {
+      const joinTitle = document.getElementById('joinGameTitle');
+      const lobbyTitle = document.getElementById('lobbyGameTitle');
+      if (joinTitle) joinTitle.textContent = data.gameTitle;
+      if (lobbyTitle) lobbyTitle.textContent = data.gameTitle;
+      document.title = `${data.gameTitle} - Player`;
+    }
+
     // Set player ID if provided (when joining)
     if (data.playerId) {
       state.playerId = data.playerId;
@@ -182,6 +191,21 @@ function setupPlayerSocketHandlers(socket, state) {
 
   socket.on('error', (message) => {
     showPlayerError(message);
-    resetJoinButton();
+
+    // If it's the "truth" error during submit phase, unlock the input
+    if (message.includes("can't fool someone with the truth") && state.currentPhase === 'submit') {
+      state.submittedAnswer = false;
+
+      // Re-enable the input and button
+      const answerInput = document.getElementById('answerInput');
+      const submitButton = document.getElementById('submitButton');
+      const submitWaiting = document.getElementById('submitWaiting');
+
+      if (answerInput) answerInput.disabled = false;
+      if (submitButton) submitButton.disabled = false;
+      if (submitWaiting) submitWaiting.style.display = 'none';
+    } else {
+      resetJoinButton();
+    }
   });
 }

@@ -271,7 +271,8 @@ class ResultsAnimator {
       sequenceId: this.sequenceId,
       voters: correctVoters
     });
-    await this.delay(this.timings.correctVoterAppearStagger * correctVoters.length + 500);
+    // Brief delay to let voters appear, then show scores immediately
+    await this.delay(500);
 
     // Phase 5: Score Correct Voters
     const correctVotersWithScores = correctVoters.map(voter => ({

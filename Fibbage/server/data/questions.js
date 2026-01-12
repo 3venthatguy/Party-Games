@@ -182,7 +182,7 @@ const questions = [
   },
   { 
     id: 31,
-    question: "The IS-LM model, developed by John Hicks in 1937, illustrates the short-run equilibrium between interest rates and output by combining the investment-saving curve with the liquidity preference-money supply curve.", 
+    question: "The _____ model, developed by John Hicks in 1937, illustrates the short-run equilibrium between interest rates and output by combining the investment-saving curve with the liquidity preference-money supply curve.", 
     answer: "IS-LM", 
     explanation: "The IS-LM model is a foundational Keynesian framework used to analyze the interaction between the goods market and money market, helping explain how fiscal and monetary policy affect interest rates and aggregate output in a closed economy." 
   },

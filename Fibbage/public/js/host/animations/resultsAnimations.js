@@ -118,17 +118,13 @@ export function revealAuthor(container, authorName, pointsEarned, options = {}) 
     headerWon.className = 'author-table-header-cell';
     headerWon.textContent = 'Won';
 
-    const headerPoints = document.createElement('div');
-    headerPoints.className = 'author-table-header-cell';
-    headerPoints.textContent = 'Points';
-
     header.appendChild(headerFooledBy);
     header.appendChild(headerWon);
-    header.appendChild(headerPoints);
     table.appendChild(header);
 
     // Handle duplicate answers - create a row for each author
     if (options.isDuplicate && options.authorNames && options.authorNames.length > 1 && options.authorIds) {
+      // Each player gets +250 when multiple players fooled with the same answer
       options.authorNames.forEach((individualName, index) => {
         const row = document.createElement('div');
         row.className = 'author-table-row';
@@ -140,21 +136,16 @@ export function revealAuthor(container, authorName, pointsEarned, options = {}) 
 
         const pointsCell = document.createElement('div');
         pointsCell.className = 'author-table-points';
-        pointsCell.textContent = `+${options.pointsPerPlayer}`;
-
-        const totalCell = document.createElement('div');
-        totalCell.className = 'author-table-total';
-        // Store player ID for score update later
-        totalCell.dataset.playerId = options.authorIds[index];
-        totalCell.textContent = '—';
+        // Show multiplier only if 2+ voters
+        const voterCount = options.voterCount || 1;
+        pointsCell.textContent = voterCount >= 2 ? `+250 x${voterCount}` : '+250';
 
         row.appendChild(nameCell);
         row.appendChild(pointsCell);
-        row.appendChild(totalCell);
         table.appendChild(row);
       });
     } else {
-      // Single author - create one row
+      // Single author gets +500
       const row = document.createElement('div');
       row.className = 'author-table-row';
 
@@ -164,19 +155,12 @@ export function revealAuthor(container, authorName, pointsEarned, options = {}) 
 
       const pointsCell = document.createElement('div');
       pointsCell.className = 'author-table-points';
-      pointsCell.textContent = `+${pointsEarned}`;
-
-      const totalCell = document.createElement('div');
-      totalCell.className = 'author-table-total';
-      // Store player ID for score update later (for single author)
-      if (options.authorId) {
-        totalCell.dataset.playerId = options.authorId;
-      }
-      totalCell.textContent = '—';
+      // Show multiplier only if 2+ voters
+      const voterCount = options.voterCount || 1;
+      pointsCell.textContent = voterCount >= 2 ? `+500 x${voterCount}` : '+500';
 
       row.appendChild(nameCell);
       row.appendChild(pointsCell);
-      row.appendChild(totalCell);
       table.appendChild(row);
     }
 

@@ -26,7 +26,8 @@ const playingMusicFiles = [
   'sounds/playing/Windmill_Isle.mp3',
   'sounds/playing/bongos.mp3',
   'sounds/playing/botanic_panic.mp3',
-  'sounds/playing/incredits.mp3'
+  'sounds/playing/LoonBoon.mp3',
+  'sounds/playing/Forcast.mp3'
 ];
 
 /**

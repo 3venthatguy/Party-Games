@@ -34,24 +34,38 @@ module.exports = {
   CORRECT_VOTE_POINTS: 1000,
   FOOL_PLAYER_POINTS: 500,
 
+  // Game text customization
+  GAME_TITLE: 'ECON FIBBAGE',
+  GAME_RULES: `Welcome to ECON FIBBAGE! Here's how to play:
+
+1. You'll see a question with a blank space
+2. Make up a LIE that sounds believable to fill in the blank
+3. Everyone votes on which answer they think is TRUE
+4. Earn points by:
+   • Fooling other players with your lie
+   • Voting for the correct answer
+5. The player with the most points wins!
+
+Remember: The best lies are the ones that sound almost true!`,
+
   // Timer broadcast interval
   TIMER_BROADCAST_INTERVAL: 1000,
 
   // Results animation timings (in milliseconds)
   RESULTS_ANIMATION_TIMINGS: {
-    answerHighlight: 1000,
-    suspensePause: 1500,
-    lieRevealDuration: 1500,
-    voterAppearStagger: 1500,
-    authorRevealDuration: 1500,
-    scoreAnimationDuration: 1500,
-    reactionPause: 2000,
-    transitionDuration: 1000,
-    correctAnswerHighlight: 1000,
-    truthRevealDuration: 1500,
-    correctVoterAppearStagger: 2000,
-    explanationDisplay: 4000,
-    scoreboardAnimation: 2000,
-    betweenAnswers: 500
+    answerHighlight: 1000,              // Duration for highlighting a fake answer before revealing it
+    suspensePause: 1500,                // Pause duration to build suspense before showing who fooled whom
+    lieRevealDuration: 1500,            // Duration to display "IT'S A LIE!" text above fake answer
+    voterAppearStagger: 1000,           // Time between each fooled player appearing on screen
+    authorRevealDuration: 1000,         // Duration to show the author who created the fake answer
+    scoreAnimationDuration: 1300,       // Duration for score counting animation and point displays
+    reactionPause: 1500,                // Pause to let players react before moving to next answer
+    transitionDuration: 1000,           // Duration for fade-out transition between answers
+    correctAnswerHighlight: 1000,       // Duration for highlighting the correct answer
+    truthRevealDuration: 1500,          // Duration to display "THE TRUTH!" text above correct answer
+    correctVoterAppearStagger: 1500,    // Time between each correct voter appearing on screen
+    explanationDisplay: 4000,           // Duration to display the explanation text
+    scoreboardAnimation: 2000,          // Duration for the leaderboard animation
+    betweenAnswers: 500                 // Short pause between processing different answers
   }
 };

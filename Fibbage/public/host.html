@@ -18,8 +18,9 @@
   <div class="container">
     <!-- Lobby Screen -->
     <div id="lobbyScreen" class="lobby-screen active">
-      <h1 style="font-size: 48px; margin-bottom: 20px;">Fibbage</h1>
+      <h1 id="gameTitle" style="font-size: 48px; margin-bottom: 20px;">Fibbage</h1>
       <div class="room-code-display" id="roomCodeDisplay">----</div>
+      <div class="game-rules" id="gameRules" style="max-width: 700px; margin: 20px auto; padding: 25px 30px; background: linear-gradient(135deg, rgba(255,107,129,0.2) 0%, rgba(78,205,196,0.2) 100%); border: 3px solid rgba(255,255,255,0.4); border-radius: 20px; text-align: left; white-space: pre-line; line-height: 1.8; font-size: 16px; font-weight: 500; color: #ffffff; box-shadow: 0 8px 32px rgba(0,0,0,0.3); text-shadow: 1px 1px 2px rgba(0,0,0,0.5);"></div>
       <div class="player-count" id="playerCount">Waiting for players...</div>
       <div class="players-grid" id="playersGrid"></div>
       <button class="start-button" id="startButton" disabled>Start Game</button>
@@ -46,6 +47,8 @@
       <!-- Voting Phase -->
       <div id="votingPhase" class="voting-phase" style="display: none;">
         <h2 style="font-size: 36px; margin-bottom: 30px;">Vote for the correct answer!</h2>
+        <div class="voting-status" id="votingStatus">Players are voting...</div>
+        <div class="voting-checkmarks" id="votingCheckmarks"></div>
         <div class="answers-grid" id="answersGrid"></div>
       </div>
 
