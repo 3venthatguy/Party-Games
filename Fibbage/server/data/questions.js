@@ -176,7 +176,7 @@ const questions = [
   },
   { 
     id: 30,
-    question: "The _____ model, also known as the aggregate demand-aggregate supply model, is widely used to explain fluctuations in output and price levels, including short-run effects of demand shocks and long-run neutrality of money.", 
+    question: "The _____ model is widely used to explain fluctuations in output and price levels, including short-run effects of demand shocks and long-run neutrality of money.", 
     answer: "AD-AS", 
     explanation: "The AD-AS model depicts how shifts in aggregate demand or supply affect real GDP and the price level, with the vertical long-run aggregate supply curve reflecting classical assumptions of full employment and flexible prices." 
   },

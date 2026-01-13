@@ -12,32 +12,41 @@ const soundEffects = {
   pop: 'sounds/effects/pop-sound.mp3',
   success: 'sounds/effects/success.mp3',
   ticking: 'sounds/effects/ticking_timer.mp3',
-  timeToVote: 'sounds/effects/time_to_vote.mp3'
+  timeToVote: 'sounds/effects/time_to_vote.mp3',
+  drumRoll: 'sounds/effects/drum_roll.mp3',
+  error: 'sounds/effects/error.mp3',
+  successEnding: 'sounds/effects/Success_Ending.mp3'
 };
 
 // Cache for sound effect Audio objects
 const sfxCache = {};
 
+// Currently playing looping sounds
+let currentTickingSound = null;
+
 /**
  * Plays a sound effect.
- * @param {string} effectName - Name of the effect (fail, pop, success, ticking, timeToVote)
+ * @param {string} effectName - Name of the effect (fail, pop, success, ticking, timeToVote, drumRoll, error)
  * @param {number} volume - Volume level (0-1), default 0.5
+ * @param {boolean} loop - Whether to loop the sound, default false
+ * @returns {Audio|null} The audio object if created, null otherwise
  */
-function playSoundEffect(effectName, volume = 0.5) {
+function playSoundEffect(effectName, volume = 0.5, loop = false) {
   if (!sfxEnabled) {
     console.log('SFX is disabled');
-    return;
+    return null;
   }
 
   const effectPath = soundEffects[effectName];
   if (!effectPath) {
     console.error('Unknown sound effect:', effectName);
-    return;
+    return null;
   }
 
   // Create new audio instance (allows multiple overlapping sounds)
   const audio = new Audio(effectPath);
   audio.volume = volume;
+  audio.loop = loop;
 
   audio.play()
     .then(() => {
@@ -46,6 +55,19 @@ function playSoundEffect(effectName, volume = 0.5) {
     .catch(error => {
       console.log('Could not play SFX:', effectName, error);
     });
+
+  return audio;
+}
+
+/**
+ * Stops a currently playing sound effect.
+ * @param {Audio} audio - The audio object to stop
+ */
+function stopSoundEffect(audio) {
+  if (audio) {
+    audio.pause();
+    audio.currentTime = 0;
+  }
 }
 
 /**

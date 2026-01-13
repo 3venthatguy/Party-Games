@@ -15,7 +15,7 @@ module.exports = {
 
   // Game configuration
   MIN_PLAYERS: 2,
-  QUESTIONS_PER_GAME: 2,
+  QUESTIONS_PER_GAME: 8,
   MAX_PLAYER_NAME_LENGTH: 20,
   MAX_ANSWER_LENGTH: 100,
 
@@ -25,7 +25,7 @@ module.exports = {
   VOTING_PHASE_DURATION: 20,
 
   // Transition delays (in milliseconds)
-  GAME_START_DELAY: 1000,
+  GAME_START_DELAY: 2000,
   VOTING_TRANSITION_DELAY: 2000,
   RESULTS_TRANSITION_DELAY: 3000, // Increased to allow time_to_vote.mp3 to play + 2s delay
   AUTO_ADVANCE_DELAY: 3000,
@@ -38,7 +38,7 @@ module.exports = {
   GAME_TITLE: 'ECON FIBBAGE',
   GAME_RULES: `Welcome to ECON FIBBAGE! Here's how to play:
 
-1. You'll see a question with a blank space
+1. You'll play through 8 fill-in-the-blank questions
 2. Make up a LIE that sounds believable to fill in the blank
 3. Everyone votes on which answer they think is TRUE
 4. Earn points by:

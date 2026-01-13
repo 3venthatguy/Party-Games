@@ -58,10 +58,10 @@ function setupButtonHandlers() {
 
   if (startButton) {
     startButton.addEventListener('click', () => {
-      // User interaction - try to start music if it failed on page load
-      if (isMusicEnabled() && !isGameMusicPlaying()) {
-        playRandomIntroMusic();
-      }
+      // Stop intro music when starting game
+      stopGameMusic();
+      // Play time to vote sound when starting game
+      playSoundEffect('timeToVote', AUDIO_CONFIG.SFX_TIME_TO_VOTE_VOLUME);
       socket.emit('startGame', { roomCode: hostState.roomCode });
       startButton.disabled = true;
     });

@@ -581,7 +581,7 @@ body {
 
 @keyframes truthRevealPulse {
   0% { transform: scale(0.5); opacity: 0; }
-  50% { transform: scale(1.15); }
+  50% { transform: scale(1.1); }
   100% { transform: scale(1); opacity: 1; }
 }
 
@@ -593,6 +593,19 @@ body {
   0% { transform: scale(1); }
   50% { transform: scale(1.2); }
   100% { transform: scale(1); }
+}
+
+.correct-answer-revealed {
+  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%) !important;
+  border: 3px solid #2e7d32 !important;
+  box-shadow: 0 0 30px rgba(67, 160, 71, 0.6) !important;
+  animation: correctAnswerPulse 0.6s ease-out;
+}
+
+@keyframes correctAnswerPulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 rgba(67, 160, 71, 0); }
+  50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(67, 160, 71, 0.8); }
+  100% { transform: scale(1); box-shadow: 0 0 30px rgba(67, 160, 71, 0.6); }
 }
 
 .voters-container,

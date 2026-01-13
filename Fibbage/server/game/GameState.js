@@ -162,6 +162,24 @@ class GameState {
   }
 
   /**
+   * Removes a player from the game.
+   * @param {string} playerId - Player ID to remove
+   * @returns {boolean} True if player was removed, false otherwise
+   */
+  removePlayer(playerId) {
+    const index = this.players.findIndex(p => p.id === playerId);
+    if (index !== -1) {
+      this.players.splice(index, 1);
+      // Clean up player's submitted answer if any
+      delete this.submittedAnswers[playerId];
+      // Clean up player's vote if any
+      delete this.votes[playerId];
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Transfers host to another player.
    * @param {string} newHostSocketId - Socket ID of new host
    */

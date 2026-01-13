@@ -381,10 +381,26 @@ class ResultsAnimator {
 
   /**
    * Shows the leaderboard (called when host clicks the button).
+   * For the last question, goes to game over instead.
    */
   showLeaderboardNow() {
     if (this.leaderboardData) {
-      this.io.to(this.roomCode).emit('results:showLeaderboard', this.leaderboardData);
+      // Check if this is the last question
+      const isLastQuestion = this.gameState.currentQuestionIndex >= this.gameState.selectedQuestionIds.length - 1;
+
+      if (isLastQuestion) {
+        // Last question - go to game over
+        console.log('[ResultsAnimator] Last question - button click going to game over');
+
+        // Sort by score descending for final results
+        const finalScores = [...this.leaderboardData.totalScores].sort((a, b) => b.score - a.score);
+
+        // Emit game over event
+        this.io.to(this.roomCode).emit('gameOver', { finalScores });
+      } else {
+        // Not last question - show leaderboard as normal
+        this.io.to(this.roomCode).emit('results:showLeaderboard', this.leaderboardData);
+      }
     }
   }
 

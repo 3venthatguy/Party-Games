@@ -15,6 +15,16 @@ function showGameOverScreen(finalScores) {
   gameScreen.classList.remove('active');
   gameOverScreen.classList.add('active');
 
+  // Play success ending sound effect
+  if (typeof playSoundEffect !== 'undefined') {
+    playSoundEffect('successEnding', AUDIO_CONFIG.SFX_SUCCESS_ENDING_VOLUME);
+  }
+
+  // Restore ending music volume (already playing from results phase)
+  if (typeof restoreMusicVolume !== 'undefined') {
+    restoreMusicVolume(AUDIO_CONFIG.GAME_OVER_MUSIC_VOLUME);
+  }
+
   // Show winner
   if (finalScores.length > 0) {
     winnerCelebration.textContent = `🎉 ${finalScores[0].name} Wins! 🎉`;

@@ -7,6 +7,7 @@
 let currentSequenceId = null;
 let answerElements = new Map(); // answerId -> element
 let currentAnswerElement = null;
+let currentDrumRoll = null; // Track current drum roll sound effect
 let animationState = {
   currentAnswerIndex: 0,
   fakeAnswers: [],
@@ -236,6 +237,12 @@ async function handleHighlightAnswer(data) {
   const { highlightAnswer } = await import('../animations/resultsAnimations.js');
   await highlightAnswer(answerElement);
   console.log('[ResultsScreen] Highlight animation complete');
+
+  // Play drum roll sound for suspense after highlighting
+  // Small delay to let the highlight settle before drum roll
+  setTimeout(() => {
+    currentDrumRoll = playSoundEffect('drumRoll', AUDIO_CONFIG.SFX_DRUM_ROLL_VOLUME);
+  }, 500);
 }
 
 /**
@@ -316,6 +323,15 @@ function handleTransitionNext(data) {
 function handleRevealLie(data) {
   if (data.sequenceId !== currentSequenceId || !currentAnswerElement) return;
 
+  // Stop drum roll if still playing
+  if (currentDrumRoll && typeof stopSoundEffect !== 'undefined') {
+    stopSoundEffect(currentDrumRoll);
+    currentDrumRoll = null;
+  }
+
+  // Play error sound when lie is revealed
+  playSoundEffect('error', AUDIO_CONFIG.SFX_LIE_REVEAL_VOLUME);
+
   // Add "IT'S A LIE!" text above the answer
   const lieRevealDiv = document.createElement('div');
   lieRevealDiv.className = 'lie-reveal';
@@ -353,6 +369,8 @@ function handleHighlightCorrectAnswer(data) {
     // Add vibration effect after initial highlight for suspense (like loot box opening)
     setTimeout(() => {
       correctAnswerCard.classList.add('answer-vibrating');
+      // Play drum roll sound during suspenseful vibration
+      currentDrumRoll = playSoundEffect('drumRoll', AUDIO_CONFIG.SFX_DRUM_ROLL_VOLUME);
     }, 500);
 
     currentAnswerElement = correctAnswerCard;
@@ -367,18 +385,47 @@ function handleHighlightCorrectAnswer(data) {
  * @param {object} data - Truth reveal data
  */
 function handleRevealTruth(data) {
-  if (data.sequenceId !== currentSequenceId || !currentAnswerElement) return;
+  console.log('[ResultsScreen] handleRevealTruth called');
+  console.log('[ResultsScreen] Event sequenceId:', data.sequenceId, 'Current sequenceId:', currentSequenceId);
+  console.log('[ResultsScreen] currentAnswerElement exists:', !!currentAnswerElement);
+
+  if (data.sequenceId !== currentSequenceId || !currentAnswerElement) {
+    console.log('[ResultsScreen] TRUTH REVEAL BLOCKED - sequence mismatch or no element');
+    return;
+  }
+
+  console.log('[ResultsScreen] Processing truth reveal...');
+
+  // Stop drum roll if still playing
+  if (currentDrumRoll && typeof stopSoundEffect !== 'undefined') {
+    stopSoundEffect(currentDrumRoll);
+    currentDrumRoll = null;
+  }
+
+  // Remove vibrating class before showing truth
+  currentAnswerElement.classList.remove('answer-vibrating');
+  console.log('[ResultsScreen] Removed vibrating class');
+
+  // Add green background to indicate correct answer
+  currentAnswerElement.classList.add('correct-answer-revealed');
+  console.log('[ResultsScreen] Added green background class');
+
+  // Play success sound when truth is revealed
+  playSoundEffect('success', AUDIO_CONFIG.SFX_TRUTH_REVEAL_VOLUME);
 
   // Add "THE TRUTH!" text above the answer
   const truthRevealDiv = document.createElement('div');
   truthRevealDiv.className = 'truth-reveal';
   truthRevealDiv.textContent = 'THE TRUTH!';
+  console.log('[ResultsScreen] Created truth reveal div:', truthRevealDiv);
 
   // Insert at the top of the current answer element
   currentAnswerElement.insertBefore(truthRevealDiv, currentAnswerElement.firstChild);
+  console.log('[ResultsScreen] Inserted truth reveal div into DOM');
 
   // Apply the zoom animation
   currentAnswerElement.classList.add('correct-answer-zoom');
+  console.log('[ResultsScreen] Truth reveal complete');
 }
 
 

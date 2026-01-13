@@ -28,6 +28,10 @@ function updateStartButton(playerCount) {
   startButton.disabled = playerCount < 2;
 }
 
+// Track if ticking sound is playing
+let tickingSoundPlaying = false;
+let tickingAudioInstance = null;
+
 /**
  * Updates the timer display.
  * @param {number} seconds - Remaining seconds
@@ -40,6 +44,34 @@ function updateTimer(seconds) {
     timerDisplay.classList.add('timer-warning');
   } else {
     timerDisplay.classList.remove('timer-warning');
+  }
+
+  // Play ticking sound during last 5 seconds of submit and voting phases
+  if (seconds === 5 && !tickingSoundPlaying) {
+    // Check if we're in submit or voting phase
+    if (typeof hostState !== 'undefined' &&
+        (hostState.currentPhase === 'submit' || hostState.currentPhase === 'voting')) {
+      tickingAudioInstance = playSoundEffect('ticking', AUDIO_CONFIG.SFX_TICKING_TIMER_VOLUME, true);
+      tickingSoundPlaying = true;
+    }
+  }
+
+  // Stop ticking sound when timer reaches 0 or phase changes
+  if (seconds === 0 && tickingSoundPlaying) {
+    stopSoundEffect(tickingAudioInstance);
+    tickingSoundPlaying = false;
+    tickingAudioInstance = null;
+  }
+}
+
+/**
+ * Stops the ticking timer sound if it's playing.
+ */
+function stopTickingSound() {
+  if (tickingSoundPlaying && tickingAudioInstance) {
+    stopSoundEffect(tickingAudioInstance);
+    tickingSoundPlaying = false;
+    tickingAudioInstance = null;
   }
 }
 

@@ -44,7 +44,7 @@ function setupHostSocketHandlers(socket, state) {
     updatePlayersDisplay(state.players);
     updateStartButton(state.players.length);
     // Play pop sound when a player joins
-    playSoundEffect('pop', 0.7);
+    playSoundEffect('pop', AUDIO_CONFIG.SFX_PLAYER_JOIN_VOLUME);
   });
 
   socket.on('gameStarted', () => {
@@ -83,13 +83,18 @@ function setupHostSocketHandlers(socket, state) {
     console.log('[SocketHandlers] phaseChange event received:', data);
     state.currentPhase = data.phase;
 
+    // Stop ticking sound on any phase change
+    if (typeof stopTickingSound !== 'undefined') {
+      stopTickingSound();
+    }
+
     if (data.phase === 'reading') {
       showReadingPhase(data.timeRemaining);
       // Stop game music during reading phase
       stopGameMusic();
     } else if (data.phase === 'submit') {
       showSubmitPhase(state.players.length);
-      // Start game music for submit phase
+      // Start game music for submit phase (volume already set in playRandomGameMusic)
       playRandomGameMusic();
     } else if (data.phase === 'voting') {
       console.log('[SocketHandlers] Showing voting phase...');
@@ -102,8 +107,10 @@ function setupHostSocketHandlers(socket, state) {
       console.log('[SocketHandlers] Showing results phase...');
       showResultsPhase();
       hideTimer(); // Hide timer during results animation
-      // Stop music during results
+      // Switch to ending music for results phase at lower volume
       stopGameMusic();
+      playRandomEndingMusic();
+      lowerMusicVolume(AUDIO_CONFIG.RESULTS_MUSIC_LOWERED_VOLUME);
     }
 
     updateTimer(data.timeRemaining);
@@ -117,22 +124,30 @@ function setupHostSocketHandlers(socket, state) {
     const { submittedCount, totalPlayers } = data;
     updateSubmitStatus(submittedCount, totalPlayers);
     // Play pop sound when an answer is submitted
-    playSoundEffect('pop', 0.4);
+    playSoundEffect('pop', AUDIO_CONFIG.SFX_ANSWER_SUBMIT_VOLUME);
   });
 
   socket.on('allAnswersSubmitted', () => {
     showAllAnswersSubmitted();
+    // Stop ticking sound if all players finished early
+    if (typeof stopTickingSound !== 'undefined') {
+      stopTickingSound();
+    }
   });
 
   socket.on('voteSubmitted', (data) => {
     const { voteCount, totalPlayers } = data;
     updateVotingStatus(voteCount, totalPlayers);
     // Play pop sound when a vote is cast
-    playSoundEffect('pop', 0.4);
+    playSoundEffect('pop', AUDIO_CONFIG.SFX_VOTE_CAST_VOLUME);
 
     // Show "All votes submitted!" when everyone has voted
     if (voteCount === totalPlayers) {
       showAllVotesSubmitted();
+      // Stop ticking sound if all players finished early
+      if (typeof stopTickingSound !== 'undefined') {
+        stopTickingSound();
+      }
     }
   });
 
@@ -252,14 +267,13 @@ function setupHostSocketHandlers(socket, state) {
     // Stop music first
     stopGameMusic();
     // Play the transition sound effect
-    playSoundEffect('timeToVote', 0.6);
+    playSoundEffect('timeToVote', AUDIO_CONFIG.SFX_TIME_TO_VOTE_VOLUME);
   });
 
   socket.on('gameOver', (data) => {
     const { finalScores } = data;
     showGameOverScreen(finalScores);
-    // Stop game music when game ends
-    stopGameMusic();
+    // Don't stop music - ending music continues from results phase
   });
 
   socket.on('error', (message) => {

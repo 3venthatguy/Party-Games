@@ -7,7 +7,7 @@ const GameState = require('./GameState');
 const Player = require('./Player');
 const config = require('../config');
 const { sanitizePlayerName } = require('../utils/validation');
-const { logPlayerJoined, logGameStarted, logPhaseTransition, logAnswerSubmitted, logVoteSubmitted, logVoteForCorrect, logResults, logHostTransfer } = require('../utils/logger');
+const { logPlayerJoined, logGameStarted, logPhaseTransition, logAnswerSubmitted, logVoteSubmitted, logVoteForCorrect, logResults, logHostTransfer, logPlayerRemoved } = require('../utils/logger');
 const { getShuffledAnswers, isAnswerValid } = require('./AnswerManager');
 const { calculateResults } = require('./ScoreCalculator');
 
@@ -259,7 +259,9 @@ class GameRoom {
     }
 
     if (this.gameState.phase !== 'results') {
-      throw new Error('Not in results phase');
+      // Already transitioned (likely duplicate click), silently ignore
+      console.log('[GameRoom] nextQuestion called but not in results phase:', this.gameState.phase);
+      return this.gameState;
     }
 
     this.loadQuestion(this.gameState.currentQuestionIndex + 1);
@@ -281,7 +283,10 @@ class GameRoom {
   handleDisconnect(playerId) {
     const player = this.gameState.getPlayer(playerId);
     if (player) {
-      player.disconnect();
+      const playerName = player.name;
+      // Remove the player entirely from the game so their name can be reused
+      this.gameState.removePlayer(playerId);
+      logPlayerRemoved(playerName, this.gameState.roomCode);
     }
   }
 

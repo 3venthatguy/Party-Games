@@ -53,6 +53,10 @@ function logDisconnection(socketId) {
   console.log(`Client disconnected: ${socketId}`);
 }
 
+function logPlayerRemoved(playerName, roomCode) {
+  console.log(`Player ${playerName} removed from room ${roomCode} (name now available)`);
+}
+
 function logError(context, error) {
   console.error(`Error in ${context}:`, error);
 }
@@ -74,6 +78,7 @@ module.exports = {
   logRoomCleanup,
   logConnection,
   logDisconnection,
+  logPlayerRemoved,
   logError,
   logQuestionsSelected
 };

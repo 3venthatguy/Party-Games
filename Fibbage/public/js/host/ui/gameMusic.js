@@ -14,6 +14,7 @@ const introMusicFiles = [
   'sounds/intro/LeFestin.mp3',
   'sounds/intro/Monogatari.mp3',
   'sounds/intro/a_birds_last_look.mp3',
+  'sounds/intro/MonstersInc.mp3',
   'sounds/intro/abandoned_plaza.mp3'
 ];
 
@@ -27,7 +28,16 @@ const playingMusicFiles = [
   'sounds/playing/bongos.mp3',
   'sounds/playing/botanic_panic.mp3',
   'sounds/playing/LoonBoon.mp3',
+  'sounds/playing/ColdIsland.mp3',
+  'sounds/playing/TimeMachine.mp3',
   'sounds/playing/Forcast.mp3'
+];
+
+// Available ending music files (game over)
+const endingMusicFiles = [
+  'sounds/endings/AquaticGroove.mp3',
+  'sounds/endings/FunkMagic.mp3',
+  'sounds/endings/SmoothJazz.mp3'
 ];
 
 /**
@@ -74,14 +84,21 @@ function playRandomMusic(musicFiles, volume = 0.4) {
  * Plays random lobby music (intro folder).
  */
 function playRandomIntroMusic() {
-  playRandomMusic(introMusicFiles, 0.5);
+  playRandomMusic(introMusicFiles, AUDIO_CONFIG.INTRO_MUSIC_VOLUME);
 }
 
 /**
  * Plays random game music (playing folder).
  */
 function playRandomGameMusic() {
-  playRandomMusic(playingMusicFiles, 0.4);
+  playRandomMusic(playingMusicFiles, AUDIO_CONFIG.GAMEPLAY_MUSIC_VOLUME);
+}
+
+/**
+ * Plays random ending music (endings folder).
+ */
+function playRandomEndingMusic() {
+  playRandomMusic(endingMusicFiles, AUDIO_CONFIG.ENDING_MUSIC_VOLUME);
 }
 
 /**
