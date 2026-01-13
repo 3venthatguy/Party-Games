@@ -16,9 +16,14 @@ export function highlightAnswer(answerElement) {
     }
 
     answerElement.classList.add('answer-highlighted');
-    
+
     // Play sound
     playSound('ding');
+
+    // After initial highlight, add vibration effect for suspense
+    setTimeout(() => {
+      answerElement.classList.add('answer-vibrating');
+    }, 500);
 
     setTimeout(() => {
       resolve();

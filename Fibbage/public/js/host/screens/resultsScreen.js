@@ -349,6 +349,12 @@ function handleHighlightCorrectAnswer(data) {
     correctAnswerCard.style.display = 'block';
     correctAnswerCard.classList.remove('answer-dimmed');
     correctAnswerCard.classList.add('answer-highlighted');
+
+    // Add vibration effect after initial highlight for suspense (like loot box opening)
+    setTimeout(() => {
+      correctAnswerCard.classList.add('answer-vibrating');
+    }, 500);
+
     currentAnswerElement = correctAnswerCard;
     console.log('[ResultsScreen] Correct answer highlighted');
   } else {

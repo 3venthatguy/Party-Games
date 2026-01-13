@@ -243,6 +243,136 @@
   }
 }
 
+/* Loot Box Vibration Animation - Intense suspense shake */
+.answer-vibrating {
+  animation: lootBoxVibrate 1.5s ease-in-out;
+}
+
+@keyframes lootBoxVibrate {
+  0% {
+    transform: translateX(0) scale(1.05);
+  }
+  2% {
+    transform: translateX(-3px) rotate(-0.5deg) scale(1.05);
+  }
+  4% {
+    transform: translateX(3px) rotate(0.5deg) scale(1.05);
+  }
+  6% {
+    transform: translateX(-3px) rotate(-0.5deg) scale(1.05);
+  }
+  8% {
+    transform: translateX(3px) rotate(0.5deg) scale(1.05);
+  }
+  10% {
+    transform: translateX(-2px) rotate(-0.3deg) scale(1.05);
+  }
+  12% {
+    transform: translateX(2px) rotate(0.3deg) scale(1.05);
+  }
+  14% {
+    transform: translateX(-2px) rotate(-0.3deg) scale(1.05);
+  }
+  16% {
+    transform: translateX(2px) rotate(0.3deg) scale(1.05);
+  }
+  18% {
+    transform: translateX(-1px) rotate(-0.2deg) scale(1.05);
+  }
+  20% {
+    transform: translateX(1px) rotate(0.2deg) scale(1.05);
+  }
+  22% {
+    transform: translateX(-1px) rotate(-0.2deg) scale(1.05);
+  }
+  24% {
+    transform: translateX(1px) rotate(0.2deg) scale(1.05);
+  }
+  26% {
+    transform: translateX(0) scale(1.05);
+  }
+  /* Pause briefly */
+  50% {
+    transform: translateX(0) scale(1.05);
+  }
+  /* Resume vibration with increasing intensity */
+  52% {
+    transform: translateX(-4px) rotate(-1deg) scale(1.06);
+  }
+  54% {
+    transform: translateX(4px) rotate(1deg) scale(1.06);
+  }
+  56% {
+    transform: translateX(-4px) rotate(-1deg) scale(1.06);
+  }
+  58% {
+    transform: translateX(4px) rotate(1deg) scale(1.06);
+  }
+  60% {
+    transform: translateX(-5px) rotate(-1.5deg) scale(1.07);
+  }
+  62% {
+    transform: translateX(5px) rotate(1.5deg) scale(1.07);
+  }
+  64% {
+    transform: translateX(-5px) rotate(-1.5deg) scale(1.07);
+  }
+  66% {
+    transform: translateX(5px) rotate(1.5deg) scale(1.07);
+  }
+  68% {
+    transform: translateX(-6px) rotate(-2deg) scale(1.08);
+  }
+  70% {
+    transform: translateX(6px) rotate(2deg) scale(1.08);
+  }
+  72% {
+    transform: translateX(-6px) rotate(-2deg) scale(1.08);
+  }
+  74% {
+    transform: translateX(6px) rotate(2deg) scale(1.08);
+  }
+  76% {
+    transform: translateX(-5px) rotate(-1.5deg) scale(1.08);
+  }
+  78% {
+    transform: translateX(5px) rotate(1.5deg) scale(1.08);
+  }
+  80% {
+    transform: translateX(-4px) rotate(-1deg) scale(1.08);
+  }
+  82% {
+    transform: translateX(4px) rotate(1deg) scale(1.08);
+  }
+  84% {
+    transform: translateX(-3px) rotate(-0.5deg) scale(1.08);
+  }
+  86% {
+    transform: translateX(3px) rotate(0.5deg) scale(1.08);
+  }
+  88% {
+    transform: translateX(-2px) rotate(-0.3deg) scale(1.08);
+  }
+  90% {
+    transform: translateX(2px) rotate(0.3deg) scale(1.08);
+  }
+  92% {
+    transform: translateX(-1px) rotate(-0.2deg) scale(1.08);
+  }
+  94% {
+    transform: translateX(1px) rotate(0.2deg) scale(1.08);
+  }
+  96% {
+    transform: translateX(-1px) rotate(-0.1deg) scale(1.08);
+  }
+  98% {
+    transform: translateX(1px) rotate(0.1deg) scale(1.08);
+  }
+  100% {
+    transform: translateX(0) rotate(0deg) scale(1.05);
+  }
+}
+
 /* "IT'S A LIE!" Reveal */
 .lie-reveal {
   text-align: center;

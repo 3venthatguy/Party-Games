@@ -69,14 +69,37 @@ class ResultsAnimator {
       };
     });
 
-    // CRITICAL: Filter to only include answers that received votes (Jackbox flow)
-    const votedOnFakeAnswers = allFakeAnswers.filter(answer => answer.voters.length > 0);
+    // Show ALL fake answers (including those with zero votes) to keep players on edge
+    console.log(`[ResultsAnimator] Total fake answers: ${allFakeAnswers.length}, With votes: ${allFakeAnswers.filter(a => a.voters.length > 0).length}`);
 
-    console.log(`[ResultsAnimator] Total fake answers: ${allFakeAnswers.length}, With votes: ${votedOnFakeAnswers.length}`);
+    // Separate voted and unvoted fake answers
+    const votedFakeAnswers = allFakeAnswers.filter(fa => fa.voters.length > 0);
+    const unvotedFakeAnswers = allFakeAnswers.filter(fa => fa.voters.length === 0);
 
-    // Prepare all answers data for client (including correct answer)
-    const allAnswersData = [
-      ...votedOnFakeAnswers.map(fa => ({
+    // Randomize voted fake answers
+    const shuffledVotedFakes = this.shuffleArray(votedFakeAnswers);
+
+    // Create reveal sequence: voted fakes first, then correct answer
+    // Unvoted answers are displayed but never revealed
+    const revealSequence = [
+      ...shuffledVotedFakes.map(fa => ({ type: 'fake', data: fa })),
+      {
+        type: 'correct',
+        data: {
+          correctAnswer,
+          explanation,
+          votes,
+          roundScores
+        }
+      }
+    ];
+
+    console.log(`[ResultsAnimator] Reveal sequence: ${votedFakeAnswers.length} voted fakes (randomized) + 1 correct answer. ${unvotedFakeAnswers.length} unvoted answers will be skipped.`);
+
+    // Prepare all answers data for client (ALL answers for display, in random order)
+    // Mix all answers together for initial display only
+    const allAnswersForDisplay = this.shuffleArray([
+      ...allFakeAnswers.map(fa => ({
         id: fa.playerId,
         text: fa.answerText,
         isCorrect: false
@@ -86,34 +109,43 @@ class ResultsAnimator {
         text: correctAnswer,
         isCorrect: true
       }
-    ];
+    ]);
 
     // Emit start sequence event with answer data
     this.io.to(this.roomCode).emit('results:startSequence', {
       sequenceId: this.sequenceId,
-      fakeAnswerCount: votedOnFakeAnswers.length,
+      fakeAnswerCount: allFakeAnswers.length,
       timings: this.timings,
-      answers: allAnswersData // NEW: Send answer data to client
+      answers: allAnswersForDisplay
     });
 
     // Wait a moment for clients to prepare
     await this.delay(500);
 
-    // Reveal each voted-on fake answer
-    for (let i = 0; i < votedOnFakeAnswers.length; i++) {
-      const fakeAnswer = votedOnFakeAnswers[i];
-      await this.revealFakeAnswer(fakeAnswer, i);
+    // Reveal each answer: voted fakes first (randomized), then correct answer
+    // Unvoted fakes are never revealed (revealFakeAnswer will skip them)
+    for (let i = 0; i < revealSequence.length; i++) {
+      const item = revealSequence[i];
 
-      // Brief pause between answers
-      if (i < votedOnFakeAnswers.length - 1) {
+      if (item.type === 'fake') {
+        await this.revealFakeAnswer(item.data, i);
+      } else {
+        // Reveal correct answer after all voted fakes
+        await this.revealCorrectAnswer(
+          item.data.correctAnswer,
+          item.data.explanation,
+          item.data.votes,
+          item.data.roundScores
+        );
+      }
+
+      // Brief pause between answers (except after the last one)
+      if (i < revealSequence.length - 1) {
         await this.delay(this.timings.betweenAnswers);
       }
     }
 
-    // Reveal correct answer (always last)
-    await this.revealCorrectAnswer(correctAnswer, explanation, votes, roundScores);
-
-    // Show explanation AFTER correct answer reveal
+    // Show explanation AFTER all answers (including correct) have been revealed
     await this.showExplanation(explanation);
 
     // Update scoreboard
@@ -158,11 +190,18 @@ class ResultsAnimator {
 
   /**
    * Reveals a single fake answer with full animation sequence.
+   * If the answer has no votes, it's skipped (no highlight, no animation, no points).
    * @param {object} fakeAnswer - Fake answer data
    * @param {number} index - Index in sequence
    */
   async revealFakeAnswer(fakeAnswer, index) {
     const { playerId, playerName, answerText, voters, pointsEarned, playerIds, playerNames, pointsPerPlayer } = fakeAnswer;
+
+    // Skip animation for answers with no votes - they just sit on the board
+    if (voters.length === 0) {
+      console.log(`[ResultsAnimator] Skipping animation for answer with no votes: "${answerText}"`);
+      return;
+    }
 
     // Phase 1: Highlight Answer
     this.io.to(this.roomCode).emit('results:highlightAnswer', {
@@ -347,6 +386,20 @@ class ResultsAnimator {
     if (this.leaderboardData) {
       this.io.to(this.roomCode).emit('results:showLeaderboard', this.leaderboardData);
     }
+  }
+
+  /**
+   * Shuffles an array using Fisher-Yates algorithm.
+   * @param {Array} array - Array to shuffle
+   * @returns {Array} Shuffled array
+   */
+  shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
   }
 }
 
