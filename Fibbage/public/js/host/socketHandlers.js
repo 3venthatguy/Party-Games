@@ -264,6 +264,8 @@ function setupHostSocketHandlers(socket, state) {
 
   socket.on('playTransitionSound', () => {
     console.log('[SocketHandlers] Playing transition sound before results');
+    // Stop ticking timer sound if playing
+    stopTickingSound();
     // Stop music first
     stopGameMusic();
     // Play the transition sound effect

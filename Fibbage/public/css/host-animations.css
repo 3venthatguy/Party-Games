@@ -7,7 +7,11 @@
   animation: answerPulse 0.5s ease-in-out;
   border: 3px solid #667eea !important;
   box-shadow: 0 0 20px rgba(102, 126, 234, 0.6) !important;
-  transform: scale(1.05);
+  transform: scale(1);
+}
+
+.answer-highlighted:hover {
+  transform: scale(1.05) !important;
 }
 
 @keyframes answerPulse {
@@ -20,7 +24,7 @@
     box-shadow: 0 0 30px rgba(102, 126, 234, 0.8);
   }
   100% {
-    transform: scale(1.05);
+    transform: scale(1);
     box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
   }
 }

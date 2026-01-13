@@ -238,11 +238,8 @@ async function handleHighlightAnswer(data) {
   await highlightAnswer(answerElement);
   console.log('[ResultsScreen] Highlight animation complete');
 
-  // Play drum roll sound for suspense after highlighting
-  // Small delay to let the highlight settle before drum roll
-  setTimeout(() => {
-    currentDrumRoll = playSoundEffect('drumRoll', AUDIO_CONFIG.SFX_DRUM_ROLL_VOLUME);
-  }, 500);
+  // Play drum roll sound immediately with no delay
+  currentDrumRoll = playSoundEffect('drumRoll', AUDIO_CONFIG.SFX_DRUM_ROLL_VOLUME);
 }
 
 /**

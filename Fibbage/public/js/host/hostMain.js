@@ -58,6 +58,8 @@ function setupButtonHandlers() {
 
   if (startButton) {
     startButton.addEventListener('click', () => {
+      // Stop ticking timer sound if playing
+      stopTickingSound();
       // Stop intro music when starting game
       stopGameMusic();
       // Play time to vote sound when starting game

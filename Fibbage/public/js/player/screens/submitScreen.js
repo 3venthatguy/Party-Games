@@ -38,7 +38,7 @@ function setupSubmitScreen(onSubmit) {
   const charCounter = document.getElementById('charCounter');
 
   answerInput.addEventListener('input', (e) => {
-    e.target.value = e.target.value.substring(0, 100);
+    e.target.value = e.target.value.substring(0, 100).toUpperCase();
     updateCharCounter(e.target.value.length);
     updateSubmitButtonState();
   });

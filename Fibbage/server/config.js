@@ -26,7 +26,7 @@ module.exports = {
 
   // Transition delays (in milliseconds)
   GAME_START_DELAY: 2000,
-  VOTING_TRANSITION_DELAY: 2000,
+  VOTING_TRANSITION_DELAY: 1000,
   RESULTS_TRANSITION_DELAY: 3000, // Increased to allow time_to_vote.mp3 to play + 2s delay
   AUTO_ADVANCE_DELAY: 3000,
 
