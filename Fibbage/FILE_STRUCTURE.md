@@ -2,24 +2,24 @@
 
 ## Project Overview
 
-This document provides a complete map of the refactored Economics Fibbage codebase.
+This document provides a complete map of the Economics Fibbage codebase with modular architecture.
 
 ---
 
 ## Root Directory
 
 ```
-economics-fibbage/
-├── README.md                           # Project documentation
-├── REFACTORING_SUMMARY.md             # Refactoring summary and quick reference
-├── FILE_STRUCTURE.md                  # This file - complete structure guide
-├── package.json                       # Node.js dependencies
-├── backup-original-files/             # Backup of original monolithic files
-│   ├── host.js (305 lines)           # Original host script
-│   ├── player.js (379 lines)         # Original player script
-│   └── questions.js (59 lines)       # Original questions file
-├── server/                           # Server-side code
-└── public/                           # Client-side code
+Fibbage/
+├── README.md                           # Main project documentation
+├── STARTUP_GUIDE.md                    # Quick start guide for running the game
+├── HOST_HTML_STRUCTURE.md              # Host screen HTML structure documentation
+├── FILE_STRUCTURE.md                   # This file - complete structure guide
+├── package.json                        # Node.js dependencies and scripts
+├── package-lock.json                   # Locked dependency versions
+├── .vscode/                           # VSCode workspace settings
+│   └── settings.json
+├── server/                            # Server-side code
+└── public/                            # Client-side code
 ```
 
 ---
@@ -69,13 +69,14 @@ routes/
 
 ```
 socket/
-├── socketHandler.js (23 lines)       # Main socket setup - delegates to event modules
-├── timerBroadcast.js (103 lines)    # Timer broadcast logic for all rooms
+├── socketHandler.js               # Main socket setup - delegates to event modules
+├── timerBroadcast.js             # Timer broadcast logic for all rooms
 └── events/
-    ├── connectionEvents.js (31 lines)    # connect, disconnect
-    ├── roomEvents.js (54 lines)          # createRoom, joinRoom
-    ├── gameEvents.js (93 lines)          # startGame, nextQuestion
-    └── playerEvents.js (90 lines)        # submitAnswer, submitVote
+    ├── connectionEvents.js       # connect, disconnect
+    ├── roomEvents.js            # createRoom, joinRoom
+    ├── gameEvents.js            # startGame, nextQuestion
+    ├── playerEvents.js          # submitAnswer, submitVote
+    └── resultsEvents.js         # Results phase and animations
 ```
 
 **socketHandler.js** - Coordinates all socket event handlers
@@ -98,18 +99,23 @@ socket/
 - `submitAnswer` - Records player answer
 - `submitVote` - Records player vote
 
+**events/resultsEvents.js** - Handles:
+- Results phase coordination
+- Animated result reveals
+
 ---
 
 ### Game Logic (`/server/game/`)
 
 ```
 game/
-├── GameRoom.js (248 lines)           # Single room coordinator
-├── Player.js (61 lines)              # Player data model
-├── GameState.js (139 lines)          # Game state management
-├── Timer.js (42 lines)               # Phase timer logic
-├── ScoreCalculator.js (65 lines)     # Scoring calculations
-└── AnswerManager.js (50 lines)       # Answer shuffling/validation
+├── GameRoom.js                # Single room coordinator
+├── Player.js                  # Player data model
+├── GameState.js               # Game state management
+├── Timer.js                   # Phase timer logic
+├── ScoreCalculator.js         # Scoring calculations
+├── AnswerManager.js           # Answer shuffling/validation
+└── ResultsAnimator.js         # Results animation sequencing
 ```
 
 **GameRoom.js** - Orchestrates a single game room:
@@ -158,6 +164,10 @@ game/
 **AnswerManager.js** - Answer utilities:
 - `getShuffledAnswers(gameState)` - Shuffles answers with correct answer
 - `isAnswerValid(answer, correctAnswer)` - Validates answer isn't correct
+
+**ResultsAnimator.js** - Results animation sequencing:
+- Coordinates animated reveal of results
+- Manages timing of result phases
 
 ---
 
@@ -217,31 +227,45 @@ data/
 
 ```
 public/
-├── host.html (79 lines)              # Host screen HTML
-├── player.html (98 lines)            # Player screen HTML
+├── host.html                        # Host screen HTML
+├── player.html                      # Player screen HTML
 ├── css/
-│   ├── host.css                     # Host screen styles
-│   └── player.css                   # Player screen styles
-└── js/                              # JavaScript modules
+│   ├── host.css                    # Host screen base styles
+│   ├── host-animations.css         # Host screen animations
+│   ├── player.css                  # Player screen base styles
+│   └── player-animations.css       # Player screen animations
+└── js/                             # JavaScript modules
 ```
 
 ---
+
+### Shared JavaScript Configuration
+
+```
+js/
+└── config.js                        # Shared audio and game configuration
+```
 
 ### Host JavaScript (`/public/js/host/`)
 
 ```
 js/host/
-├── hostMain.js (52 lines)            # Host initialization and state
-├── socketHandlers.js (87 lines)      # All host socket listeners
-├── screens/                         # Screen-specific logic
-│   ├── lobbyScreen.js (22 lines)    # Lobby UI
-│   ├── submitScreen.js (58 lines)   # Submit phase UI
-│   ├── votingScreen.js (37 lines)   # Voting phase UI
-│   ├── resultsScreen.js (58 lines)  # Results phase UI
-│   └── gameOverScreen.js (53 lines) # Game over UI
-└── ui/                             # UI utilities
-    ├── uiUpdater.js (93 lines)      # DOM manipulation
-    └── timer.js (15 lines)          # Timer display
+├── hostMain.js                      # Host initialization and state
+├── socketHandlers.js                # All host socket listeners
+├── screens/                        # Screen-specific logic
+│   ├── lobbyScreen.js              # Lobby UI
+│   ├── submitScreen.js             # Submit phase UI
+│   ├── votingScreen.js             # Voting phase UI
+│   ├── resultsScreen.js            # Results phase UI with animations
+│   └── gameOverScreen.js           # Game over UI
+├── ui/                            # UI utilities
+│   ├── uiUpdater.js               # DOM manipulation
+│   ├── timer.js                   # Timer display
+│   ├── gameMusic.js               # Background music management
+│   └── soundEffects.js            # Sound effects management
+└── animations/                    # Animation modules
+    ├── particles.js               # Particle effects
+    └── resultsAnimations.js       # Results reveal animations
 ```
 
 **hostMain.js** - Host initialization:
@@ -300,24 +324,45 @@ js/host/
 - `updateTimer(seconds)` - Updates timer display
 - `addWarningClass(threshold)` - Adds warning class at threshold
 
+**ui/gameMusic.js** - Background music:
+- Manages background music playback
+- Handles music toggle controls
+- Persistent user preferences
+
+**ui/soundEffects.js** - Sound effects:
+- Plays sound effects for game events
+- Handles SFX toggle controls
+- Manages audio timing
+
+**animations/particles.js** - Particle effects:
+- Creates visual particle effects
+- Used for celebrations and transitions
+
+**animations/resultsAnimations.js** - Results animations:
+- Animates correct answer reveal
+- Animates fooled player reveals
+- Coordinates timing of result elements
+
 ---
 
 ### Player JavaScript (`/public/js/player/`)
 
 ```
 js/player/
-├── playerMain.js (37 lines)          # Player initialization and state
-├── socketHandlers.js (99 lines)      # All player socket listeners
-├── screens/                         # Screen-specific logic
-│   ├── joinScreen.js (70 lines)     # Join screen logic
-│   ├── lobbyScreen.js (22 lines)    # Lobby UI
-│   ├── submitScreen.js (97 lines)   # Submit answer UI
-│   ├── votingScreen.js (76 lines)   # Voting UI
-│   ├── resultsScreen.js (48 lines)  # Results UI
-│   └── gameOverScreen.js (71 lines) # Game over UI
-└── ui/                             # UI utilities
-    ├── uiUpdater.js (82 lines)      # DOM manipulation
-    └── timer.js (16 lines)          # Timer display
+├── playerMain.js                    # Player initialization and state
+├── socketHandlers.js                # All player socket listeners
+├── screens/                        # Screen-specific logic
+│   ├── joinScreen.js               # Join screen logic
+│   ├── lobbyScreen.js              # Lobby UI
+│   ├── submitScreen.js             # Submit answer UI
+│   ├── votingScreen.js             # Voting UI
+│   ├── resultsScreen.js            # Results UI with animations
+│   └── gameOverScreen.js           # Game over UI
+├── ui/                            # UI utilities
+│   ├── uiUpdater.js               # DOM manipulation
+│   └── timer.js                   # Timer display
+└── animations/                    # Animation modules
+    └── resultsAnimations.js       # Results reveal animations
 ```
 
 **playerMain.js** - Player initialization:
@@ -382,38 +427,51 @@ js/player/
 - `updateTimer(seconds)` - Updates timer display
 - Adds warning class when time is low
 
+**animations/resultsAnimations.js** - Results animations:
+- Animates player results reveal
+- Coordinates timing with host screen
+
 ---
 
 ## File Count Summary
 
-### Server-Side Files (19 files)
+### Server-Side Files (21 files)
 - **Main**: 3 files (server.js, config.js, gameManager.js)
 - **Routes**: 1 file (index.js)
-- **Socket**: 5 files (socketHandler.js, timerBroadcast.js, 4 event handlers)
-- **Game**: 6 files (GameRoom, Player, GameState, Timer, ScoreCalculator, AnswerManager)
+- **Socket**: 6 files (socketHandler.js, timerBroadcast.js, 5 event handlers)
+- **Game**: 7 files (GameRoom, Player, GameState, Timer, ScoreCalculator, AnswerManager, ResultsAnimator)
 - **Utils**: 3 files (logger, validation, roomCodeGenerator)
 - **Data**: 1 file (questions.js)
 
-### Client-Side Files (20 files)
-- **Host**: 10 files
+### Client-Side Files (25 files)
+- **Shared**: 1 file (config.js)
+- **Host**: 14 files
   - Main: 2 files (hostMain.js, socketHandlers.js)
   - Screens: 5 files
-  - UI: 2 files
+  - UI: 4 files (uiUpdater, timer, gameMusic, soundEffects)
+  - Animations: 2 files (particles, resultsAnimations)
+  - Music: 1 file (placeholder for game music assets)
 - **Player**: 10 files
   - Main: 2 files (playerMain.js, socketHandlers.js)
   - Screens: 6 files
   - UI: 2 files
+  - Animations: 1 file (resultsAnimations)
 
-### HTML/CSS Files (4 files)
+### HTML/CSS Files (6 files)
 - **HTML**: 2 files (host.html, player.html)
-- **CSS**: 2 files (host.css, player.css)
+- **CSS**: 4 files (host.css, host-animations.css, player.css, player-animations.css)
 
-### Documentation (3 files)
+### Documentation (4 files)
 - README.md
-- REFACTORING_SUMMARY.md
+- STARTUP_GUIDE.md
+- HOST_HTML_STRUCTURE.md
 - FILE_STRUCTURE.md (this file)
 
-**Total: 46 files** (vs. 5 monolithic files originally)
+### Configuration (2 files)
+- package.json
+- package-lock.json
+
+**Total: 58 files** with modular architecture for easy customization and maintenance
 
 ---
 
@@ -422,18 +480,20 @@ js/player/
 ### Host Screen
 
 HTML loads scripts in this order:
-1. UI utilities (uiUpdater.js, timer.js)
-2. Screen modules (lobbyScreen, submitScreen, votingScreen, resultsScreen, gameOverScreen)
-3. Socket handlers (socketHandlers.js)
-4. Main initialization (hostMain.js)
+1. Configuration (config.js)
+2. UI utilities (uiUpdater.js, timer.js, gameMusic.js, soundEffects.js)
+3. Screen modules (lobbyScreen, submitScreen, votingScreen, resultsScreen, gameOverScreen)
+4. Socket handlers (socketHandlers.js)
+5. Main initialization (hostMain.js)
 
 ### Player Screen
 
 HTML loads scripts in this order:
-1. UI utilities (uiUpdater.js, timer.js)
-2. Screen modules (joinScreen, lobbyScreen, submitScreen, votingScreen, resultsScreen, gameOverScreen)
-3. Socket handlers (socketHandlers.js)
-4. Main initialization (playerMain.js)
+1. Configuration (config.js)
+2. UI utilities (uiUpdater.js, timer.js)
+3. Screen modules (joinScreen, lobbyScreen, submitScreen, votingScreen, resultsScreen, gameOverScreen)
+4. Socket handlers (socketHandlers.js)
+5. Main initialization (playerMain.js)
 
 ---
 
@@ -445,13 +505,20 @@ HTML loads scripts in this order:
 | Room creation | [server/socket/events/roomEvents.js](server/socket/events/roomEvents.js) |
 | Game start logic | [server/socket/events/gameEvents.js](server/socket/events/gameEvents.js) |
 | Answer submission | [server/socket/events/playerEvents.js](server/socket/events/playerEvents.js) |
+| Results animations | [server/socket/events/resultsEvents.js](server/socket/events/resultsEvents.js) |
 | Scoring logic | [server/game/ScoreCalculator.js](server/game/ScoreCalculator.js) |
 | Timer logic | [server/game/Timer.js](server/game/Timer.js) or [server/socket/timerBroadcast.js](server/socket/timerBroadcast.js) |
 | Host lobby UI | [public/js/host/screens/lobbyScreen.js](public/js/host/screens/lobbyScreen.js) |
 | Host voting UI | [public/js/host/screens/votingScreen.js](public/js/host/screens/votingScreen.js) |
+| Host results animations | [public/js/host/animations/resultsAnimations.js](public/js/host/animations/resultsAnimations.js) |
+| Background music | [public/js/host/ui/gameMusic.js](public/js/host/ui/gameMusic.js) |
+| Sound effects | [public/js/host/ui/soundEffects.js](public/js/host/ui/soundEffects.js) |
 | Player join UI | [public/js/player/screens/joinScreen.js](public/js/player/screens/joinScreen.js) |
 | Player voting UI | [public/js/player/screens/votingScreen.js](public/js/player/screens/votingScreen.js) |
 | Questions database | [server/data/questions.js](server/data/questions.js) |
+| Game title and HTML | [public/host.html](public/host.html) and [public/player.html](public/player.html) |
+| Host styles | [public/css/host.css](public/css/host.css) and [public/css/host-animations.css](public/css/host-animations.css) |
+| Player styles | [public/css/player.css](public/css/player.css) and [public/css/player-animations.css](public/css/player-animations.css) |
 
 ---
 
@@ -534,10 +601,48 @@ playerMain.js
 
 ---
 
-## Change Log
+## Recent Updates
 
-### 2026-01-09 - Complete Refactoring
-- Broke down 5 monolithic files (1,549 lines) into 46 modular files
-- Organized code into logical directories
-- Added comprehensive documentation
-- No functionality changes - game works exactly the same
+### Audio System
+- Added background music support with toggle controls
+- Added sound effects for game events (correct/incorrect answers, phase transitions)
+- Audio controls in fixed position on host screen
+- Persistent user preferences for audio settings
+
+### Animation System
+- Added reading phase with progress bar
+- Enhanced results phase with sequential animated reveals
+- Particle effects for celebrations
+- Improved visual feedback throughout the game
+
+### UI Enhancements
+- Customizable game title and rules display
+- Enhanced lobby screen with game rules
+- Improved player status indicators (checkmarks for submissions and votes)
+- Better mobile responsiveness
+
+### Documentation
+- Comprehensive README with download, setup, and customization instructions
+- Detailed startup guide for running the game
+- Host HTML structure documentation
+- Complete file structure map (this document)
+
+## Architecture Benefits
+
+### Modular Design
+- 58 well-organized files instead of monolithic code
+- Clear separation of concerns (server/client, logic/UI)
+- Easy to locate and modify specific features
+
+### Easy Customization
+- Questions: Edit [server/data/questions.js](server/data/questions.js)
+- Timing: Edit [server/config.js](server/config.js)
+- Styling: Edit CSS files in [public/css/](public/css/)
+- Game name: Edit HTML files in [public/](public/)
+- Audio: Add files and configure in [public/js/host/ui/](public/js/host/ui/)
+
+### Maintainability
+- Small, focused files are easier to understand
+- Changes have limited blast radius
+- Clear dependencies between modules
+- Consistent code patterns throughout

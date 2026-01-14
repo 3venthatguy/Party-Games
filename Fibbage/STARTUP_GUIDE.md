@@ -1,8 +1,22 @@
 # 🚀 Economics Fibbage - Startup Guide
 
+## Prerequisites
+
+Before starting, ensure you have:
+- [Node.js](https://nodejs.org/) (version 14 or higher) installed
+- All dependencies installed (run `npm install` if you haven't already)
+
 ## Quick Start
 
-### 1. Start the Server
+### 1. Install Dependencies (First Time Only)
+
+```bash
+npm install
+```
+
+This will download Express, Socket.io, and other required packages.
+
+### 2. Start the Server
 
 ```bash
 npm start
@@ -14,7 +28,7 @@ Or directly:
 node server/server.js
 ```
 
-### 2. Expected Output
+### 3. Expected Output
 
 You should see:
 
@@ -26,19 +40,31 @@ Economics Fibbage server running on port 3000
    Player screen: http://localhost:3000/player.html
 
 📱 Access from phone/other devices (same WiFi):
-   Host screen:   http://192.168.4.XXX:3000/host.html
-   Player screen: http://192.168.4.XXX:3000/player.html
+   Replace YOUR_IP with your computer's IP address:
+   Host screen:   http://YOUR_IP:3000/host.html
+   Player screen: http://YOUR_IP:3000/player.html
 ```
 
-### 3. Access the Game
+**Finding Your IP Address:**
+- **Windows**: Open Command Prompt, type `ipconfig` (look for IPv4 Address)
+- **Mac**: Open Terminal, type `ifconfig getifaddr en0` or check System Preferences > Network
+- **Linux**: Open Terminal, type `hostname -I`
 
-**From your computer:**
-- **Host**: Open http://localhost:3000/host.html in your browser
-- **Player**: Open http://localhost:3000/player.html in another tab/browser
+### 4. Access the Game
 
-**From phones/tablets (same WiFi):**
-- Use the IP address shown in the startup message
-- Example: http://192.168.4.150:3000/player.html
+**IMPORTANT:** All devices (host computer and player phones/tablets) must be on the same WiFi network.
+
+**From your computer (Host Display):**
+- Open your web browser
+- Go to: `http://localhost:3000/host.html`
+- This will display the main game screen (for TV/projector)
+
+**From phones/tablets (Player Controllers):**
+- Make sure the device is connected to the same WiFi network
+- Open a web browser on the phone/tablet
+- Go to: `http://YOUR_IP:3000/player.html`
+- Replace `YOUR_IP` with your computer's IP address
+- Example: `http://192.168.1.100:3000/player.html`
 
 ---
 
@@ -216,21 +242,34 @@ node --version
 ## File Structure Reference
 
 If you need to modify something, see:
-- **[REFACTORING_SUMMARY.md](REFACTORING_SUMMARY.md)** - Quick reference
+- **[README.md](README.md)** - Main documentation with customization guide
 - **[FILE_STRUCTURE.md](FILE_STRUCTURE.md)** - Complete file map
-- **[PROJECT_TREE.txt](PROJECT_TREE.txt)** - Visual tree
+- **[HOST_HTML_STRUCTURE.md](HOST_HTML_STRUCTURE.md)** - Host screen structure
 
-Example: To change timer duration, edit [server/config.js](server/config.js)
+**Quick Customization Examples:**
+- Change timer duration: [server/config.js](server/config.js)
+- Change questions: [server/data/questions.js](server/data/questions.js)
+- Change game title: [public/host.html](public/host.html) and [public/player.html](public/player.html)
+- Change scoring: [server/config.js](server/config.js)
 
 ---
+
+## Customization
+
+See [README.md](README.md) for detailed instructions on:
+- Changing the game name and rules
+- Adding or modifying questions
+- Adding background music and sound effects
+- Adjusting timer durations and scoring
 
 ## Support
 
 For issues or questions:
-1. Check [REFACTORING_SUMMARY.md](REFACTORING_SUMMARY.md) for common tasks
+1. Check [README.md](README.md) troubleshooting section
 2. Check server logs for error messages
-3. Verify all modules exist (files weren't accidentally deleted)
+3. Verify all dependencies are installed (`npm install`)
+4. Ensure all devices are on the same WiFi network
 
 ---
 
-**Your server is working correctly! The refactored codebase is ready to use. 🎉**
+**Ready to play! Enjoy your Economics Fibbage game! 🎉**
