@@ -2,6 +2,8 @@
 
 A multiplayer Fibbage-style economics trivia game built with Node.js, Express, and Socket.io. Players compete by submitting fake answers to economics questions and trying to fool others into voting for their answers.
 
+**Note:** This game is currently themed for economics topics, but can be easily customized for any subject matter.
+
 ## Features
 
 - **Real-time multiplayer gameplay** using WebSocket communication
@@ -15,33 +17,73 @@ A multiplayer Fibbage-style economics trivia game built with Node.js, Express, a
 - **Automatic timer management** with server-side synchronization
 - **Room-based gameplay** with unique 4-letter room codes
 
-## Installation
+## Download and Installation
+
+### What You Need
+
+- [Node.js](https://nodejs.org/) (version 14 or higher)
+- A computer to run the server (this will be the host machine)
+- All players must be on the same WiFi network
+
+### Download Options
+
+1. **Clone with Git:**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/Fibbage.git
+   ```
+
+2. **Download ZIP:**
+   - Click the green "Code" button on GitHub
+   - Select "Download ZIP"
+   - Extract the ZIP file to your desired location
+
+### Setup Instructions
 
 1. **Navigate to the project directory:**
    ```bash
-   cd economics-fibbage
+   cd Fibbage
    ```
 
 2. **Install dependencies:**
    ```bash
    npm install
    ```
+   This will download all required packages (Express, Socket.io, etc.)
 
-3. **Start the server:**
+3. **Start the game server:**
    ```bash
    npm start
    ```
+   You should see a message indicating the server is running on port 3000.
 
-   Or:
-   ```bash
-   node server/server.js
-   ```
+### Understanding Host vs WiFi Server
 
-4. **Access the game:**
-   - **Host screen** (for main display): http://localhost:3000/host.html
-   - **Player screen** (for mobile devices): http://localhost:3000/player.html
+**Important:** This game requires all players to be on the same WiFi network.
 
-   For players on the same network, replace `localhost` with your computer's IP address (e.g., `http://192.168.1.100:3000/player.html`)
+- **The Host Machine**: The computer running `npm start` acts as both the game server and can display the host screen
+- **WiFi Server**: When you start the game, your computer becomes a local server that other devices on your WiFi network can connect to
+- **All Players Must Connect**: Every player needs to access your computer's IP address to join the game
+
+### Accessing the Game
+
+Once the server is running:
+
+1. **Find your computer's local IP address:**
+   - **Windows**: Open Command Prompt and type `ipconfig` (look for IPv4 Address)
+   - **Mac**: Open Terminal and type `ipconfig getifaddr en0` or check System Preferences > Network
+   - **Linux**: Open Terminal and type `hostname -I`
+
+   Your IP will look something like `192.168.1.100`
+
+2. **On the host computer (large display/TV):**
+   - Open a web browser and go to: `http://localhost:3000/host.html`
+   - Or use: `http://YOUR_IP_ADDRESS:3000/host.html`
+
+3. **On player devices (phones/tablets):**
+   - Make sure they're connected to the same WiFi network
+   - Open a web browser and go to: `http://YOUR_IP_ADDRESS:3000/player.html`
+   - Replace `YOUR_IP_ADDRESS` with the IP address from step 1
+   - Example: `http://192.168.1.100:3000/player.html`
 
 ## How to Play
 
@@ -112,19 +154,89 @@ economics-fibbage/
 └── README.md             # This file
 ```
 
-## Adding More Questions
+## Customization
 
-To add more questions, edit `server/questions.js` and add new question objects to the array:
+### Changing the Game Name and Rules
 
+1. **Game Title**: Edit the `<title>` tags in [public/host.html](public/host.html) and [public/player.html](public/player.html)
+
+2. **Display Name**: Update the header in [public/host.html](public/host.html) (around line 30):
+   ```html
+   <h1>Your Game Name</h1>
+   ```
+
+3. **Scoring Rules**: Modify the scoring logic in [server/gameManager.js](server/gameManager.js):
+   - Look for `CORRECT_ANSWER_POINTS` and `FOOL_POINTS` constants
+   - Adjust the values in the `calculateScores` function
+
+4. **Timer Duration**: Change timer lengths in [server/gameManager.js](server/gameManager.js):
+   - Search for `SUBMIT_TIME` (default: 30 seconds)
+   - Search for `VOTING_TIME` (default: 20 seconds)
+
+### Changing the Questions
+
+To customize questions for your topic:
+
+1. Open [server/questions.js](server/questions.js)
+
+2. Each question follows this format:
+   ```javascript
+   {
+     question: "Your question text with _____ blank.",
+     answer: "The correct answer",
+     explanation: "An interesting fact or explanation."
+   }
+   ```
+
+3. Replace the existing economics questions with your own:
+   - Use `_____` (five underscores) where the answer should go
+   - Keep answers concise (works best with 1-5 words)
+   - Add engaging explanations to make the game educational
+
+4. Add or remove questions as needed - the game adapts to any number of questions
+
+**Example for a different topic (History):**
 ```javascript
 {
-  question: "Your question text with _____ blank.",
-  answer: "The correct answer",
-  explanation: "An explanation of why this answer is correct."
+  question: "The ancient Roman Colosseum could hold approximately _____ spectators.",
+  answer: "50,000",
+  explanation: "The Colosseum could hold between 50,000 to 80,000 spectators and hosted gladiator contests, animal hunts, and mock naval battles."
 }
 ```
 
-The game will automatically use all questions in the array. Currently, the game is set up for 8 questions, but you can add as many as you like.
+### Changing the Songs/Audio
+
+Currently, the game does not include background music. To add audio:
+
+1. **Add audio files**: Place MP3 or WAV files in a new `public/audio/` directory
+
+2. **Background Music**: Add to [public/host.html](public/host.html):
+   ```html
+   <audio id="bgMusic" loop autoplay>
+     <source src="/audio/your-music.mp3" type="audio/mpeg">
+   </audio>
+   ```
+
+3. **Sound Effects**: Add to [public/js/host.js](public/js/host.js) or [public/js/player.js](public/js/player.js):
+   ```javascript
+   const correctSound = new Audio('/audio/correct.mp3');
+   const wrongSound = new Audio('/audio/wrong.mp3');
+
+   // Play when needed
+   correctSound.play();
+   ```
+
+4. **Control volume in JavaScript:**
+   ```javascript
+   document.getElementById('bgMusic').volume = 0.3; // 30% volume
+   ```
+
+**Recommended sound events:**
+- Question start
+- Answer submission
+- Voting complete
+- Correct/incorrect answer reveal
+- Game end
 
 ## Technical Details
 
